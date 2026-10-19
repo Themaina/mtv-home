@@ -48,6 +48,8 @@ class AlertEngine(private val state: State) {
 
     fun evaluate(quotes: List<Quote>, stockPct: Double, fxPct: Double, now: Long): List<MarketAlert> {
         if (quotes.isEmpty()) return emptyList()
+        // First run after install: note where things stand without announcing moves that already happened.
+        val firstRun = state.lastSession.isEmpty()
         val alerts = mutableListOf<MarketAlert>()
 
         val today = dayKey(quotes.firstOrNull { !it.isFx }?.regularStart?.takeIf { it > 0 } ?: now)
@@ -61,7 +63,7 @@ class AlertEngine(private val state: State) {
             val threshold = if (q.isFx) fxPct else stockPct
             if (threshold <= 0) continue
             // Stocks only move during a session; don't alert on stale closes overnight.
-            if (!q.isFx && q.session(now) == Session.CLOSED && state.lastSession.isNotEmpty()) continue
+            if (!q.isFx && q.session(now) == Session.CLOSED) continue
             val steps = (abs(q.changePct) / threshold).toInt()
             if (steps < 1) continue
             val up = q.changePct > 0
@@ -73,19 +75,19 @@ class AlertEngine(private val state: State) {
         }
 
         val stock = quotes.firstOrNull { !it.isFx }
-        if (stock != null) {
-            val session = stock.session(now)
-            val previous = state.lastSession
-            state.lastSession = session.name
-            if (previous.isNotEmpty() && previous != session.name) {
-                when {
-                    session == Session.OPEN -> alerts += MarketAlert(
-                        "session:open:$today", "US market is open", summary(quotes), null, now,
-                    )
-                    previous == Session.OPEN.name -> alerts += MarketAlert(
-                        "session:close:$today", "US market closed", summary(quotes), null, now,
-                    )
-                }
+        val session = stock?.session(now)
+        val previous = state.lastSession
+        state.lastSession = session?.name ?: previous.ifEmpty { Session.OPEN.name }
+        if (firstRun) return emptyList()
+
+        if (session != null && previous != session.name) {
+            when {
+                session == Session.OPEN -> alerts += MarketAlert(
+                    "session:open:$today", "US market is open", summary(quotes), null, now,
+                )
+                previous == Session.OPEN.name -> alerts += MarketAlert(
+                    "session:close:$today", "US market closed", summary(quotes), null, now,
+                )
             }
         }
         return alerts

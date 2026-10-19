@@ -32,6 +32,15 @@ class MarketTest {
     }
 
     @Test
+    fun firstRunAfterInstallIsSilent() {
+        val engine = AlertEngine(AlertEngine.State())
+        assertEquals(0, engine.evaluate(listOf(quote("TSLA", 103.8, 100.0)), 2.0, 0.5, open).size)
+        // Same move again: still nothing. A new step: alert.
+        assertEquals(0, engine.evaluate(listOf(quote("TSLA", 103.9, 100.0)), 2.0, 0.5, open).size)
+        assertEquals("Tesla up 4.2% today", engine.evaluate(listOf(quote("TSLA", 104.2, 100.0)), 2.0, 0.5, open).single().title)
+    }
+
+    @Test
     fun weakerShillingIsBadNews() {
         val engine = AlertEngine(AlertEngine.State(lastSession = "OPEN"))
         val a = engine.evaluate(listOf(quote("USDKES=X", 130.5, 129.6, fx = true)), 2.0, 0.5, open).single()

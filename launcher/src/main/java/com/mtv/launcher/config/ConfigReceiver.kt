@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.mtv.launcher.market.MarketService
 
 /**
  * Lets the installer personalise the app over adb. Protected by android.permission.DUMP,
@@ -24,6 +25,8 @@ class ConfigReceiver : BroadcastReceiver() {
         intent.getStringExtra("boot_home")?.toBooleanStrictOrNull()?.let { cfg.bootToHome = it }
         intent.getStringExtra("x_feeds")?.let { cfg.xFeeds = it.split("|").map(String::trim).filter(String::isNotEmpty) }
         Log.i("ConfigReceiver", "configured: name=${cfg.name} city=${cfg.city} watchlist=${cfg.watchlist}")
+        // The installer can't start the (unexported) watcher itself; this broadcast does it.
+        MarketService.start(context, refresh = true)
         resultData = "ok"
     }
 }

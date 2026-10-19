@@ -172,12 +172,16 @@ EXTRAS=()
 [ -n "$NAME" ] && EXTRAS+=(--es name "'$NAME'")
 [ -n "$CITY" ] && EXTRAS+=(--es city "'$CITY'")
 [ -n "$WATCHLIST" ] && EXTRAS+=(--es watchlist "'$WATCHLIST'")
-if [ ${#EXTRAS[@]} -gt 0 ]; then
+[ ${#EXTRAS[@]} -gt 0 ] || info "Keeping your existing settings."
+# Always sent (even with no settings): it also starts the market watcher.
+if true; then
   # -f 0x20 (FLAG_INCLUDE_STOPPED_PACKAGES): a freshly installed app is "stopped" and would miss it.
-  RESULT=$(tv shell am broadcast -f 0x20 -a com.mtv.launcher.CONFIGURE -n "$PKG/.config.ConfigReceiver" "${EXTRAS[@]}" 2>&1)
-  if printf '%s' "$RESULT" | grep -q 'data="ok"'; then info "Saved your settings."; else info "Couldn't save settings ($RESULT). Use Personalize on the TV."; fi
-else
-  info "Keeping your existing settings."
+  RESULT=$(tv shell am broadcast -f 0x20 -a com.mtv.launcher.CONFIGURE -n "$PKG/.config.ConfigReceiver" ${EXTRAS[@]+"${EXTRAS[@]}"} 2>&1)
+  if printf '%s' "$RESULT" | grep -q 'data="ok"'; then
+    [ ${#EXTRAS[@]} -gt 0 ] && info "Saved your settings."
+  else
+    info "Couldn't reach the app ($RESULT). Open it once from the TV."
+  fi
 fi
 
 # ---- 6. permissions -----------------------------------------------------------------------
@@ -190,7 +194,6 @@ tv shell cmd deviceidle whitelist +"$PKG" >/dev/null 2>&1 || true
 
 # ---- 7. home screen -----------------------------------------------------------------------
 tv shell cmd package set-home-activity "$HOME_ACTIVITY" >/dev/null 2>&1 || true
-tv shell am start-foreground-service -n "$PKG/.market.MarketService" >/dev/null 2>&1 || true
 if [ -n "$LAUNCH" ]; then tv shell input keyevent KEYCODE_HOME; fi
 
 bold "Done. Home screen: $(current_home)"

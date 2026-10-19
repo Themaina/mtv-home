@@ -12,7 +12,7 @@ object Http {
         "Mozilla/5.0 (Linux; Android 11; SmartTV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"
 
     /** Plain app identifier; Yahoo Finance rate-limits browser-looking clients that aren't browsers. */
-    const val APP_UA = "mtv-home/0.3"
+    const val APP_UA = "mtv-home/0.3.1"
 
     fun get(url: String, maxBytes: Int = 3 * 1024 * 1024, userAgent: String = BROWSER_UA): ByteArray {
         var current = url

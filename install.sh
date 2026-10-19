@@ -173,7 +173,9 @@ EXTRAS=()
 [ -n "$CITY" ] && EXTRAS+=(--es city "'$CITY'")
 [ -n "$WATCHLIST" ] && EXTRAS+=(--es watchlist "'$WATCHLIST'")
 if [ ${#EXTRAS[@]} -gt 0 ]; then
-  tv shell am broadcast -a com.mtv.launcher.CONFIGURE -n "$PKG/.config.ConfigReceiver" "${EXTRAS[@]}" >/dev/null
+  # -f 0x20 (FLAG_INCLUDE_STOPPED_PACKAGES): a freshly installed app is "stopped" and would miss it.
+  RESULT=$(tv shell am broadcast -f 0x20 -a com.mtv.launcher.CONFIGURE -n "$PKG/.config.ConfigReceiver" "${EXTRAS[@]}" 2>&1)
+  if printf '%s' "$RESULT" | grep -q 'data="ok"'; then info "Saved your settings."; else info "Couldn't save settings ($RESULT). Use Personalize on the TV."; fi
 else
   info "Keeping your existing settings."
 fi

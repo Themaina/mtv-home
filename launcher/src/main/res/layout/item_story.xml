@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="244dp"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+    android:padding="7dp">
+
+    <FrameLayout
+        android:id="@+id/card"
+        android:layout_width="match_parent"
+        android:layout_height="129dp"
+        android:background="@drawable/card_bg"
+        android:focusable="true"
+        android:foreground="@drawable/tile_bg">
+
+        <TextView
+            android:id="@+id/story_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="12dp"
+            android:textColor="#E6FFFFFF"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium" />
+
+        <ImageView
+            android:id="@+id/story_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:scaleType="centerCrop" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/story_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:lines="2"
+        android:textColor="#F2FFFFFF"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/story_meta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="#80FFFFFF"
+        android:textSize="12sp" />
+</LinearLayout>

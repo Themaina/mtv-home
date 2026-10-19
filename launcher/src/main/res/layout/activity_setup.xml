@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dash_bg">
+
+    <LinearLayout
+        android:layout_width="460dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="28dp"
+        android:paddingBottom="48dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/setup_title"
+            android:textColor="#FFFFFFFF"
+            android:textSize="22sp" />
+            <TextView style="@style/SetupLabel" android:text="@string/setup_name" />
+            <EditText android:id="@+id/setup_name" style="@style/SetupField" android:inputType="textPersonName|textCapWords" />
+            <TextView style="@style/SetupLabel" android:text="@string/setup_city" />
+            <EditText android:id="@+id/setup_city" style="@style/SetupField" android:inputType="textCapWords" />
+            <TextView style="@style/SetupLabel" android:text="@string/setup_watchlist" />
+            <EditText android:id="@+id/setup_watchlist" style="@style/SetupField" android:inputType="textCapCharacters" />
+            <TextView style="@style/SetupLabel" android:text="@string/setup_alert_pct" />
+            <EditText android:id="@+id/setup_stock_pct" style="@style/SetupField" android:inputType="numberDecimal" />
+            <TextView style="@style/SetupLabel" android:text="@string/setup_fx_pct" />
+            <EditText android:id="@+id/setup_fx_pct" style="@style/SetupField" android:inputType="numberDecimal" />
+            <TextView style="@style/SetupLabel" android:text="@string/setup_x_feeds" />
+            <EditText android:id="@+id/setup_x_feeds" style="@style/SetupField" android:inputType="textUri|textMultiLine" />
+        <CheckBox android:id="@+id/setup_alerts" style="@style/SetupCheck" android:text="@string/setup_alerts" />
+        <CheckBox android:id="@+id/setup_boot" style="@style/SetupCheck" android:text="@string/setup_boot" />
+
+        <TextView
+            android:id="@+id/setup_save"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/pill_bg"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingHorizontal="32dp"
+            android:text="@string/save"
+            android:textColor="@color/pill_text"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</ScrollView>

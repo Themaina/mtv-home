@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strong focus state so the remote's selection is obvious from the couch -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFE53935" />
+            <corners android:radius="12dp" />
+            <stroke android:width="4dp" android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FF37474F" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Deep navy glow top-right, wine glow bottom-left, like the design draft. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item><color android:color="#FF06080D" /></item>
+    <item>
+        <shape>
+            <gradient android:type="radial" android:centerX="0.78" android:centerY="0.0" android:gradientRadius="700dp"
+                android:startColor="#B31D3557" android:endColor="#001D3557" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <gradient android:type="radial" android:centerX="0.0" android:centerY="1.0" android:gradientRadius="520dp"
+                android:startColor="#8C3A0D16" android:endColor="#003A0D16" />
+        </shape>
+    </item>
+</layer-list>

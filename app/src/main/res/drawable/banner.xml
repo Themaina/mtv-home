@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 320x180 TV launcher banner: dark tile with an accent bar and a play triangle -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+    <path android:fillColor="#FF1B1F2A" android:pathData="M0,0h320v180h-320z" />
+    <path android:fillColor="#FFE53935" android:pathData="M0,150h320v30h-320z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M135,45L195,80L135,115Z" />
+</vector>

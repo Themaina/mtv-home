@@ -1,0 +1,127 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>mtv Dashboard</title><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06080D;--glass:rgba(255,255,255,.08);--glass2:rgba(255,255,255,.14);--line:rgba(255,255,255,.10);--txt:#fff;--mut:rgba(255,255,255,.62);--up:#30D158;--down:#FF453A;--accent:#FFD60A}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1b1d22;font-family:Roboto,system-ui,sans-serif;color:var(--txt);padding:24px 16px 64px}
+h1.page{font:500 20px Roboto;color:#cfd3da;max-width:1280px;margin:0 auto 6px}
+p.page{color:#9aa1ad;max-width:1280px;margin:0 auto 18px;font-size:14px;line-height:1.5}
+.label{max-width:1280px;margin:22px auto 8px;color:#9aa1ad;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.fit{width:100%;max-width:1280px;margin:0 auto;aspect-ratio:16/9;position:relative}
+.screen{width:1280px;height:720px;position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.5);
+  background:radial-gradient(1200px 600px at 75% -10%,#1d3557 0%,rgba(29,53,87,0) 60%),radial-gradient(900px 500px at 0% 100%,#3a0d16 0%,rgba(58,13,22,0) 55%),var(--bg)}
+.hdr{position:absolute;left:48px;right:48px;top:26px;display:flex;justify-content:space-between;align-items:flex-start}
+.greet b{font:500 30px Roboto;display:block}
+.greet span{color:var(--mut);font-size:16px}
+.right{display:flex;align-items:center;gap:18px}
+.weather{color:var(--mut);font-size:16px}
+.bell{position:relative;width:24px;height:24px;opacity:.9}
+.bell i{position:absolute;right:-8px;top:-8px;background:var(--down);border-radius:10px;font:700 11px Roboto;padding:2px 6px;font-style:normal}
+.clock{font:300 30px Roboto}
+.brief{position:absolute;left:48px;right:48px;top:100px;display:flex;gap:10px;align-items:center;color:rgba(255,255,255,.86);font-size:15px}
+.brief .dot{width:8px;height:8px;border-radius:4px;background:var(--accent);flex:none}
+.sec{position:absolute;left:48px;font:500 16px Roboto;color:rgba(255,255,255,.75);display:flex;gap:8px;align-items:center}
+.sec em{font-style:normal;font-size:11px;background:var(--glass2);border-radius:6px;padding:2px 6px;color:var(--accent)}
+.rowx{position:absolute;left:48px;display:flex;gap:16px}
+.xcard{width:284px;height:118px;border-radius:14px;background:var(--glass);border:1px solid var(--line);padding:12px 14px}
+.xcard.focus{transform:scale(1.06);background:rgba(255,255,255,.16);border:2px solid #fff;box-shadow:0 14px 30px rgba(0,0,0,.5);transform-origin:left center}
+.xhead{display:flex;gap:10px;align-items:center}
+.xhead b{display:block;font-size:14px}.xhead span{color:var(--mut);font-size:12px}
+.av{width:30px;height:30px;border-radius:15px;display:grid;place-items:center;font:700 10px Roboto}
+.xlogo{margin-left:auto;color:var(--mut);font-size:16px}
+.xcard p{margin-top:8px;font-size:13.5px;line-height:1.35;color:rgba(255,255,255,.88);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.main{position:absolute;left:48px;top:330px;display:flex;gap:16px}
+.card{border-radius:16px;background:var(--glass);border:1px solid var(--line)}
+.markets{width:388px;height:190px;padding:14px 16px}
+.mh{display:flex;justify-content:space-between;color:var(--mut);font-size:12px;margin-bottom:4px}.mh b{color:#fff;font-size:15px;font-weight:500}
+.mrow{display:flex;align-items:center;gap:10px;height:50px;border-top:1px solid var(--line)}
+.mrow:first-of-type{border-top:0}
+.mname{width:118px}.mname b{display:block;font-size:15px}.mname span{color:var(--mut);font-size:11.5px}
+.mval{margin-left:auto;text-align:right}.mval b{display:block;font-size:16px}.mval span{font-size:12px}
+.up{color:var(--up)}.down{color:var(--down)}
+.yt{width:262px;height:190px;border-radius:16px;position:relative;overflow:hidden;padding:16px;display:flex;flex-direction:column;justify-content:flex-end}
+.yt .logo{position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:8px;font:700 20px Roboto;letter-spacing:-.5px}
+.yt small{color:rgba(255,255,255,.75);font-size:12.5px}.yt b{font:500 16px Roboto;margin-top:2px}
+.play{width:42px;height:30px;border-radius:9px;background:#FF0033;display:grid;place-items:center}
+.play:after{content:"";border-left:12px solid #fff;border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px}
+.ytm .play{width:34px;height:34px;border-radius:17px;box-shadow:0 0 0 4px rgba(255,0,51,.35)}
+.top{width:228px;height:190px;overflow:hidden}
+.top img{width:100%;height:110px;object-fit:cover;display:block}
+.top .t{padding:8px 12px;font-size:13.5px;line-height:1.3}.top .s{padding:0 12px;color:var(--accent);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;margin-top:8px}
+.apps{position:absolute;left:48px;top:574px;display:flex;gap:14px}
+.atile{height:84px;border-radius:12px;display:grid;place-items:center;font:700 18px Roboto;border:1px solid var(--line)}
+.al{text-align:center;color:var(--mut);font-size:12px;margin-top:6px}
+.stories{position:absolute;left:48px;display:flex;gap:16px}
+.story .simg{height:128px;border-radius:12px;overflow:hidden;background:var(--glass)}
+.story img{width:100%;height:100%;object-fit:cover}
+.story .ph{height:100%;display:grid;place-items:center;color:var(--mut)}
+.st{margin-top:8px;font-size:13.5px;line-height:1.3;height:35px;overflow:hidden}
+.sm{color:var(--mut);font-size:11.5px;margin-top:3px}
+.tiles{position:absolute;left:48px;display:flex;gap:14px}
+.tile{width:150px;height:76px;border-radius:12px;display:grid;place-items:center;font:500 15px Roboto}
+.notes{position:absolute;left:48px;display:flex;gap:16px}
+.note{width:284px;height:84px;padding:12px 14px}.note small{color:var(--mut);font-size:11px}.note b{display:block;font-size:14px;margin-top:4px}.note span{font-size:12.5px;color:rgba(255,255,255,.8)}
+.legend{max-width:1280px;margin:14px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.legend div{background:#24272e;border-radius:10px;padding:10px 12px;font-size:13px;color:#c9ced6;line-height:1.45}
+.legend b{color:#fff}
+@media (max-width:700px){body{padding:16px 12px 48px}}
+</style></head><body>
+<h1 class="page">mtv Home: personal dashboard (design draft)</h1>
+<p class="page">Drawn at the TV's real 1280×720. Market numbers and headlines are live from this evening; 𝕏 posts are placeholders until a feed is connected.</p>
+<div class="label">1 · Home, top (what you see after pressing HOME)</div>
+<div class="fit"><div class="screen">
+<div class="hdr"><div class="greet"><b>Good evening, Maina</b><span>Tuesday, 20 October</span></div>
+  <div class="right"><span class="weather">Nairobi · 18°</span>
+  <svg class="bell" viewBox="0 0 24 24"><path fill="#fff" d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+  <span style="margin-left:-14px;margin-top:-18px;background:var(--down);border-radius:10px;font:700 11px Roboto;padding:2px 6px">2</span>
+  <span class="clock">9:41 PM</span></div></div>
+<div class="brief"><span class="dot"></span>Tesla is up 3.8% and SpaceX up 1.3% today. The shilling is at 129.82 to the dollar. Plex has a security patch out, and you have Plex installed.</div>
+<div class="sec" style="top:140px">Latest from 𝕏 <em>SAMPLE</em></div>
+<div class="rowx" style="top:168px"><div class="xcard focus"><div class="xhead"><div class="av" style="background:#0B1D3A">SX</div>
+      <div><b>SpaceX</b><span>@SpaceX · 12m</span></div><div class="xlogo">𝕏</div></div><p>Launch updates, mission news and Starship flight results appear here.</p></div><div class="xcard"><div class="xhead"><div class="av" style="background:#B3141E">T</div>
+      <div><b>Tesla</b><span>@Tesla · 38m</span></div><div class="xlogo">𝕏</div></div><p>Product news and delivery numbers from Tesla's account appear here.</p></div><div class="xcard"><div class="xhead"><div class="av" style="background:#8B0000">BBC</div>
+      <div><b>BBC Africa</b><span>@BBCAfrica · 1h</span></div><div class="xlogo">𝕏</div></div><p>Breaking stories from across the continent appear here.</p></div><div class="xcard"><div class="xhead"><div class="av" style="background:#5200FF">V</div>
+      <div><b>The Verge</b><span>@verge · 2h</span></div><div class="xlogo">𝕏</div></div><p>Big Tech headlines from the accounts you follow appear here.</p></div></div>
+<div class="sec" style="top:302px">Today</div>
+<div class="main">
+  <div class="card markets"><div class="mh"><b>Markets</b><span>Live · 9:40 PM</span></div>
+    <div class="mrow"><div class="mname"><b>TSLA</b><span>Tesla</span></div><svg width="110" height="34" viewBox="0 0 110 34"><polyline fill="none" stroke="var(--up)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="0.0,32.0 4.2,26.7 8.5,19.1 12.7,13.4 16.9,12.5 21.2,10.8 25.4,9.1 29.6,5.5 33.8,5.7 38.1,4.7 42.3,6.9 46.5,5.8 50.8,3.0 55.0,2.0 59.2,5.9 63.5,6.6 67.7,3.5 71.9,6.7 76.2,7.2 80.4,9.9 84.6,6.7 88.8,3.4 93.1,3.0 97.3,5.0 101.5,2.7 105.8,5.7 110.0,5.8"/></svg>
+      <div class="mval"><b>$368.06</b><span class="up">▲ 3.76%</span></div></div><div class="mrow"><div class="mname"><b>SPCX</b><span>SpaceX</span></div><svg width="110" height="34" viewBox="0 0 110 34"><polyline fill="none" stroke="var(--up)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="0.0,13.3 4.2,23.6 8.5,6.8 12.7,5.9 16.9,13.9 21.2,8.2 25.4,6.5 29.6,2.0 33.8,3.6 38.1,6.6 42.3,4.8 46.5,10.7 50.8,12.7 55.0,17.4 59.2,23.9 63.5,19.1 67.7,25.2 71.9,25.9 76.2,27.1 80.4,29.0 84.6,25.9 88.8,26.9 93.1,32.0 97.3,32.0 101.5,27.5 105.8,23.9 110.0,24.0"/></svg>
+      <div class="mval"><b>$147.96</b><span class="up">▲ 1.32%</span></div></div><div class="mrow"><div class="mname"><b>USD/KES</b><span>Shilling per dollar</span></div><svg width="110" height="34" viewBox="0 0 110 34"><polyline fill="none" stroke="var(--up)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="0.0,32.0 2.9,19.1 5.8,19.1 8.7,26.3 11.6,19.1 14.5,19.1 17.4,19.1 20.3,19.1 23.2,19.1 26.1,19.1 28.9,17.7 31.8,17.7 34.7,17.7 37.6,17.7 40.5,17.7 43.4,17.7 46.3,17.7 49.2,17.7 52.1,17.7 55.0,26.3 57.9,26.3 60.8,26.3 63.7,26.3 66.6,26.3 69.5,26.3 72.4,26.3 75.3,26.3 78.2,26.3 81.1,26.3 83.9,26.3 86.8,26.3 89.7,26.3 92.6,2.0 95.5,2.0 98.4,2.0 101.3,2.0 104.2,2.0 107.1,2.0 110.0,2.0"/></svg>
+      <div class="mval"><b>KSh 129.82</b><span class="up">▲ 0.85%</span></div></div></div>
+  <div class="yt card" style="background:linear-gradient(160deg,#2a0a10,#120406 70%)"><div class="logo"><span class="play"></span>YouTube</div><small>Your main app</small><b>Open YouTube</b></div>
+  <div class="yt ytm card" style="background:linear-gradient(160deg,#1a1a1a,#0a0a0a 70%)"><div class="logo"><span class="play"></span>Music</div><small>Not installed yet</small><b>Install YouTube Music</b></div>
+  <div class="card top"><img src="https://cdn.arstechnica.net/wp-content/uploads/2026/10/GettyImages-2214263510-1024x648.jpg"><div class="s">Top story · Ars Technica</div><div class="t">Accused OpenAI spy had folder called “Saudi Gov Docs,” FBI says</div></div>
+</div>
+<div class="sec" style="top:546px">Your apps</div>
+<div class="apps"><div class="app" style="width:148px"><div class="atile" style="background:#000;color:#E50914">NETFLIX</div><div class="al">Netflix</div></div><div class="app" style="width:148px"><div class="atile" style="background:#0F171E;color:#00A8E1">prime video</div><div class="al">Prime Video</div></div><div class="app" style="width:148px"><div class="atile" style="background:#121212;color:#1DB954">Spotify</div><div class="al">Spotify</div></div><div class="app" style="width:148px"><div class="atile" style="background:#1F1F1F;color:#E5A00D">plex</div><div class="al">Plex</div></div><div class="app" style="width:148px"><div class="atile" style="background:#FF8800;color:#fff">VLC</div><div class="al">VLC</div></div><div class="app" style="width:148px"><div class="atile" style="background:#2B2F36;color:#fff">Chrome</div><div class="al">Chrome</div></div><div class="app" style="width:148px"><div class="atile" style="background:rgba(255,255,255,.12);color:#fff">⋯</div><div class="al">All apps</div></div></div>
+</div></div>
+<div class="legend">
+ <div><b>Brief</b>: one plain-language line about your markets and apps, refreshed through the day.</div>
+ <div><b>Latest from 𝕏</b>: posts from the accounts you pick, newest first. First row, as asked.</div>
+ <div><b>Markets</b>: TSLA, SPCX and USD/KES with today's line. Green up, red down.</div>
+ <div><b>YouTube and YouTube Music</b>: big, one press away. Music needs installing first.</div>
+</div>
+<div class="label">2 · Scrolled down</div>
+<div class="fit"><div class="screen">
+<div class="hdr"><div class="greet"><b style="font-size:22px">Home</b></div><div class="right"><span class="clock" style="font-size:24px">9:41 PM</span></div></div>
+<div class="sec" style="top:78px">Notifications</div>
+<div class="notes" style="top:104px">
+  <div class="card note"><small>Download Manager · 1h</small><b>Live NetTV</b><span>Download complete.</span></div>
+  <div class="card note"><small>Download Manager · 1h</small><b>Live NetTV</b><span>Download unsuccessful.</span></div></div>
+<div class="sec" style="top:206px">Kenya &amp; Africa</div>
+<div class="stories" style="top:232px"><div class="story" style="width:228px"><div class="simg"><img src="https://ichef.bbci.co.uk/ace/standard/800/cpsprodpb/d07e/live/02bf88b0-cbd7-11f1-bc2e-018d645d8d21.jpg"></div><div class="st">Kenya cult leader who told parents to starve children guilty of 191 murders</div><div class="sm">BBC Africa · 1h</div></div><div class="story" style="width:228px"><div class="simg"><img src="https://ichef.bbci.co.uk/ace/standard/800/cpsprodpb/6002/live/ca68a640-cbae-11f1-821f-c5d07d801cca.png"></div><div class="st">Exiled critic of Rwandan president found beheaded</div><div class="sm">BBC Africa · 1h</div></div><div class="story" style="width:228px"><div class="simg"><img src="https://ichef.bbci.co.uk/ace/standard/800/cpsprodpb/bf55/live/9ea947a0-cbb1-11f1-81ef-39e22b578b80.jpg"></div><div class="st">Burundi striker Berahino retires at 33</div><div class="sm">BBC Africa · 1h</div></div><div class="story" style="width:228px"><div class="simg"><img src="https://ichef.bbci.co.uk/ace/standard/800/cpsprodpb/6ae2/live/aea9db50-c950-11f1-8879-9d9deeb686e1.jpg"></div><div class="st">Patients in chains rescued from suspected illegal rehab centre in South Africa</div><div class="sm">BBC Africa · 1h</div></div><div class="story" style="width:228px"><div class="simg"><img src="https://ichef.bbci.co.uk/ace/standard/800/cpsprodpb/002b/live/fb4e94e0-c96f-11f1-80fc-ab418b149008.jpg"></div><div class="st">South African rugby player Andrews dies at team hotel</div><div class="sm">BBC Africa · 1h</div></div></div>
+<div class="sec" style="top:442px">Big Tech</div>
+<div class="stories" style="top:468px"><div class="story" style="width:228px"><div class="simg"><img src="https://cdn.arstechnica.net/wp-content/uploads/2026/10/GettyImages-2214263510-1024x648.jpg"></div><div class="st">Accused OpenAI spy had folder called “Saudi Gov Docs,” FBI says</div><div class="sm">Ars Technica · 1h</div></div><div class="story" style="width:228px"><div class="simg"><img src="https://cdn.arstechnica.net/wp-content/uploads/2026/10/ICEYE_assembling_satellite_06_3x2-1152x648.jpg"></div><div class="st">Russian spacecraft maneuvers in &quot;extreme proximity&quot; to satellite used by Ukraine</div><div class="sm">Ars Technica · 1h</div></div><div class="story" style="width:228px"><div class="simg"><img src="https://cdn.arstechnica.net/wp-content/uploads/2026/10/GettyImages-1177067-1024x648.jpg"></div><div class="st">Batteries help reduce emissions, but how do we reduce their emissions?</div><div class="sm">Ars Technica · 1h</div></div><div class="story" style="width:228px"><div class="simg"><img src="https://cdn.arstechnica.net/wp-content/uploads/2026/10/plex-media-server-1152x648.webp"></div><div class="st">PSA: Patch your Plex media server before someone hacks it</div><div class="sm">Ars Technica · 1h</div></div><div class="story" style="width:228px"><div class="simg"><img src="https://cdn.arstechnica.net/wp-content/uploads/2026/10/Endurance-Energy-rockhopper-drill-1152x648.jpeg"></div><div class="st">Startup taps underwater volcano as energy source in &quot;proof point&quot; test</div><div class="sm">Ars Technica · 1h</div></div></div>
+<div class="sec" style="top:664px">Inputs</div>
+<div class="tiles" style="top:690px"><div class="tile" style="background:#2E7D32">Live TV</div><div class="tile" style="background:#1565C0">HDMI 1</div><div class="tile" style="background:#1565C0">HDMI 2</div><div class="tile" style="background:#1565C0">HDMI 3</div><div class="tile" style="background:#4527A0">AV</div><div class="tile" style="background:#4527A0">Component</div></div>
+</div></div>
+<div class="legend">
+ <div><b>Notifications</b>: only shown when there are some. OK opens, hold OK dismisses.</div>
+ <div><b>Kenya &amp; Africa</b> and <b>Big Tech</b>: open in the full-screen reader.</div>
+ <div><b>Below</b>: Inputs, All apps A–Z, Settings.</div>
+</div>
+<script>
+function fit(){document.querySelectorAll('.fit').forEach(f=>{const s=f.querySelector('.screen');s.style.transform='scale('+(f.clientWidth/1280)+')';});}
+addEventListener('resize',fit);fit();
+</script></body></html>

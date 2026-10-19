@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dash_bg">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rows"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingBottom="120dp"
+        android:scrollbars="none" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/weather"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:textColor="#9EFFFFFF"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/bell"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:alpha="0.9"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_bell"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/bell_count"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:layout_marginStart="-5dp"
+            android:layout_marginTop="-10dp"
+            android:background="@drawable/badge_bg"
+            android:gravity="center"
+            android:minWidth="16dp"
+            android:paddingHorizontal="4dp"
+            android:textColor="#FFFFFFFF"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#FFFFFFFF"
+            android:textSize="21sp" />
+    </LinearLayout>
+</FrameLayout>

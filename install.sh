@@ -23,6 +23,9 @@ PKG="com.mtv.launcher"
 HOME_ACTIVITY="$PKG/.HomeActivity"
 WORK="$HOME/.mtv"
 
+# Everything runs inside main(), called on the last line: under `curl | bash` this makes bash read
+# the whole script before running any of it, so commands that read stdin can't eat the script.
+main() {
 TV="${TV_ADDR:-}"; NAME=""; CITY=""; WATCHLIST=""; APK=""; LAUNCH=1; YES=""; UNINSTALL=""
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -68,7 +71,7 @@ find_adb() {
 }
 bold "mtv Home installer"
 ADB="$(find_adb)"
-"$ADB" start-server >/dev/null 2>&1 || true
+"$ADB" start-server </dev/null >/dev/null 2>&1 || true
 
 # ---- 2. find the TV ---------------------------------------------------------------------
 local_prefix() {
@@ -112,17 +115,17 @@ fi
 case "$TV" in *:*) ;; *) TV="$TV:5555" ;; esac
 
 bold "Connecting to $TV"
-"$ADB" connect "$TV" >/dev/null 2>&1 || true
+"$ADB" connect "$TV" </dev/null >/dev/null 2>&1 || true
 for _ in $(seq 1 30); do
-  STATE=$("$ADB" -s "$TV" get-state 2>&1 || true)
+  STATE=$("$ADB" -s "$TV" get-state </dev/null 2>&1 || true)
   case "$STATE" in
     device) break ;;
     *unauthorized*) info "Accept the \"Allow debugging?\" prompt on the TV (tick Always allow)…"; sleep 2 ;;
-    *) "$ADB" connect "$TV" >/dev/null 2>&1 || true; sleep 1 ;;
+    *) "$ADB" connect "$TV" </dev/null >/dev/null 2>&1 || true; sleep 1 ;;
   esac
 done
-[ "$("$ADB" -s "$TV" get-state 2>/dev/null)" = device ] || die "Couldn't connect to $TV. Is network debugging on?"
-tv() { "$ADB" -s "$TV" "$@"; }
+[ "$("$ADB" -s "$TV" get-state </dev/null 2>/dev/null)" = device ] || die "Couldn't connect to $TV. Is network debugging on?"
+tv() { "$ADB" -s "$TV" "$@" </dev/null; }
 info "Connected: $(tv shell getprop ro.product.manufacturer | tr -d '\r') $(tv shell getprop ro.product.model | tr -d '\r'), Android $(tv shell getprop ro.build.version.release | tr -d '\r')"
 
 current_home() { tv shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME | tail -1 | tr -d '\r'; }
@@ -199,3 +202,6 @@ if [ -n "$LAUNCH" ]; then tv shell input keyevent KEYCODE_HOME; fi
 bold "Done. Home screen: $(current_home)"
 info "Change your name, city or stocks any time: Settings row > Personalize."
 info "To undo: curl -fsSL https://raw.githubusercontent.com/$REPO/main/install.sh | bash -s -- --uninstall"
+}
+
+main "$@"

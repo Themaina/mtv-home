@@ -37,14 +37,40 @@ object PolymarketRepository {
                 parseEvents(JSONObject(get("$BASE/public-search?q=$q&limit_per_type=4&events_status=active")).optJSONArray("events"), topic)
             }.getOrDefault(emptyList()).take(2)
         }
+        // The /events listing can be several MB (one game may carry hundreds of sub-markets);
+        // /markets is ~300 KB for 40, so group those back into events here.
         val trending = runCatching {
-            parseEvents(JSONArray(get("$BASE/events?limit=20&active=true&closed=false&order=volume24hr&ascending=false")), null)
+            parseMarkets(JSONArray(get("$BASE/markets?limit=40&active=true&closed=false&order=volume24hr&ascending=false")))
         }.getOrDefault(emptyList())
         val seen = HashSet<String>()
         return (byTopic + trending).filter { seen.add(it.id) }.take(limit)
     }
 
-    private fun get(url: String) = String(Http.get(url, userAgent = Http.APP_UA), Charsets.UTF_8)
+    private fun get(url: String) = String(Http.get(url, maxBytes = 6 * 1024 * 1024, userAgent = Http.APP_UA), Charsets.UTF_8)
+
+    /** Flat markets (each with its parent event) to events, keeping the API's order. */
+    fun parseMarkets(array: JSONArray): List<PolyEvent> {
+        val groups = LinkedHashMap<String, MutableList<JSONObject>>()
+        for (i in 0 until array.length()) {
+            val m = array.getJSONObject(i)
+            val eventId = m.optJSONArray("events")?.optJSONObject(0)?.optString("id") ?: m.optString("id")
+            groups.getOrPut(eventId) { mutableListOf() } += m
+        }
+        return groups.mapNotNull { (id, markets) ->
+            val first = markets.first()
+            val parent = first.optJSONArray("events")?.optJSONObject(0)
+            val event = JSONObject()
+                .put("id", id)
+                .put("slug", parent?.optString("slug") ?: first.optString("slug"))
+                .put("title", parent?.optString("title")?.ifBlank { null } ?: first.optString("question"))
+                .put("icon", first.optString("icon"))
+                .put("volume24hr", markets.sumOf { it.optDouble("volume24hr", 0.0).let { v -> if (v.isNaN()) 0.0 else v } })
+                .put("endDate", first.optString("endDate"))
+                .put("description", first.optString("description"))
+                .put("markets", JSONArray(markets))
+            parseEvent(event, null)
+        }
+    }
 
     fun parseEvents(array: JSONArray?, topic: String?): List<PolyEvent> {
         if (array == null) return emptyList()

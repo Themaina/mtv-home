@@ -124,6 +124,16 @@ object TileSources {
             }
     }
 
+    /**
+     * Minutes each app was on screen over the last two weeks, from Android's usage stats.
+     * Needs the "usage access" app-op, which the installer grants; empty without it.
+     */
+    fun minutesUsed(ctx: Context): Map<String, Long> = runCatching {
+        val usm = ctx.getSystemService(Context.USAGE_STATS_SERVICE) as android.app.usage.UsageStatsManager
+        val now = System.currentTimeMillis()
+        usm.queryAndAggregateUsageStats(now - 14L * 86_400_000L, now).mapValues { (_, u) -> u.totalTimeInForeground / 60_000L }
+    }.getOrDefault(emptyMap())
+
     /** Apps given big cards in the "Today" row, so they're left out of "Your apps". */
     val FEATURED_PACKAGES = setOf(YOUTUBE, YOUTUBE_TIZENTUBE, YOUTUBE_MUSIC, F1TV)
 

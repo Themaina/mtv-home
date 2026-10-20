@@ -15,6 +15,7 @@ import com.mtv.launcher.f1.F1Snapshot
 class F1Activity : Activity() {
 
     private lateinit var list: LinearLayout
+    private lateinit var scroll: android.widget.ScrollView
     private lateinit var tabs: List<TextView>
     private var tab = 0
     private val listener: () -> Unit = { render() }
@@ -23,6 +24,7 @@ class F1Activity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_f1)
         list = findViewById(R.id.f1_list)
+        scroll = findViewById(R.id.f1_list_scroll)
         findViewById<CountdownView>(R.id.f1_countdown).setStyle(32f, 10f)
         tabs = listOf(findViewById(R.id.tab_drivers), findViewById(R.id.tab_teams), findViewById(R.id.tab_season))
         tabs.forEachIndexed { i, t ->
@@ -79,15 +81,21 @@ class F1Activity : Activity() {
         tabs.forEachIndexed { j, t -> t.isSelected = j == i }
         val snap: F1Snapshot = DataHub.f1 ?: return
         list.removeAllViews()
+        scroll.scrollTo(0, 0)
         when (i) {
             0 -> snap.drivers.take(20).forEach { d -> list.addView(row("${d.position}  ${d.name}", d.team, "${d.points} pts", dim = false, accent = d.position == 1)) }
             1 -> snap.constructors.forEach { c -> list.addView(row("${c.position}  ${c.name}", "", "${c.points} pts", dim = false, accent = c.position == 1)) }
             2 -> {
                 val now = System.currentTimeMillis()
                 val nextRound = snap.next(now)?.round ?: Int.MAX_VALUE
+                var nextRow: View? = null
                 snap.races.forEach { r ->
-                    list.addView(row("R${r.round}  ${r.shortName}", android.text.format.DateFormat.format("d MMM", r.raceStart).toString(), if (r.round < nextRound) getString(R.string.f1_done) else "", dim = r.round < nextRound, accent = r.round == nextRound))
+                    val v = row("R${r.round}  ${r.shortName}", android.text.format.DateFormat.format("d MMM", r.raceStart).toString(), if (r.round < nextRound) getString(R.string.f1_done) else "", dim = r.round < nextRound, accent = r.round == nextRound)
+                    if (r.round == nextRound) nextRow = v
+                    list.addView(v)
                 }
+                // Start the season list a couple of rows above the next race.
+                list.post { nextRow?.let { scroll.smoothScrollTo(0, (it.top - dp(60)).coerceAtLeast(0)) } }
             }
         }
         // Animate the list in.

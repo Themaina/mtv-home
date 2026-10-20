@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <!-- Market alerts over other apps; granted by the installer with appops. -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Orders "Your apps" by real use; granted by the installer with appops. -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
+        xmlns:tools="http://schemas.android.com/tools" tools:ignore="ProtectedPermissions" />
 
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.software.leanback" android:required="true" />

@@ -197,6 +197,8 @@ tv shell cmd notification allow_listener "$PKG/$PKG.notify.NotificationService" 
   && info "Notifications on the dashboard: on" || info "Notifications: not supported on this TV"
 tv shell appops set "$PKG" SYSTEM_ALERT_WINDOW allow >/dev/null 2>&1 \
   && info "Market alerts over other apps: on" || info "Pop-up alerts: not supported on this TV"
+tv shell appops set "$PKG" GET_USAGE_STATS allow >/dev/null 2>&1 \
+  && info "Apps ordered by how much you use them: on" || true
 tv shell cmd deviceidle whitelist +"$PKG" >/dev/null 2>&1 || true
 
 # ---- 7. home screen -----------------------------------------------------------------------

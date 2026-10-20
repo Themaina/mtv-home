@@ -60,6 +60,7 @@ class HomeActivity : Activity() {
     private val weatherRepo by lazy { WeatherRepository(this) }
 
     private var apps: List<Tile> = emptyList()
+    private var usage: Map<String, Long> = emptyMap()
     private var inputs: List<Tile> = emptyList()
     private var settings: List<Tile> = emptyList()
     private var tilesLoaded = false
@@ -169,7 +170,9 @@ class HomeActivity : Activity() {
             addAction(Intent.ACTION_TIMEZONE_CHANGED)
         })
         updateClock()
-        if (tilesLoaded) publish(refocus = false)
+        if (tilesLoaded) {
+            tilesIo.execute { val u = TileSources.minutesUsed(this); main.post { usage = u; publish(refocus = false) } }
+        }
         main.removeCallbacks(ticker)
         main.post(ticker)
         MarketService.start(this, refresh = true)
@@ -208,11 +211,13 @@ class HomeActivity : Activity() {
         val generation = ++loadGeneration
         tilesIo.execute {
             val newApps = TileSources.apps(this)
+            val newUsage = TileSources.minutesUsed(this)
             val newInputs = TileSources.inputs(this)
             val newSettings = TileSources.settings(this)
             main.post {
                 if (generation != loadGeneration || isDestroyed) return@post
                 apps = newApps
+                usage = newUsage
                 inputs = newInputs
                 settings = newSettings
                 val first = !tilesLoaded
@@ -288,7 +293,9 @@ class HomeActivity : Activity() {
         val snapshot = news
 
         val recent = apps.filter { it.packageName !in TileSources.FEATURED_PACKAGES }.sortedWith(
-            compareByDescending<Tile> { prefs.getLong(it.packageName, 0L) }
+            // Most-watched first (usage stats); without usage access, most recently opened from here.
+            compareByDescending<Tile> { usage[it.packageName] ?: 0L }
+                .thenByDescending { prefs.getLong(it.packageName, 0L) }
                 .thenBy(String.CASE_INSENSITIVE_ORDER) { it.label },
         )
         val alphabetical = apps.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.label })

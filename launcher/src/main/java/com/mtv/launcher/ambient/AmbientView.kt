@@ -70,13 +70,14 @@ class AmbientView(context: Context) : FrameLayout(context) {
         panel = findViewById(R.id.amb_panel)
         caption = findViewById(R.id.amb_caption)
         ticker = findViewById(R.id.amb_ticker)
+        com.mtv.launcher.Fonts.clock(clock, weight = 700, opticalSize = 32, tracking = -0.035f)
         ImageLoader.init(context)
     }
 
     private val clockTick = object : Runnable {
         override fun run() {
             val now = Date()
-            clock.text = DateFormat.getTimeFormat(context).format(now)
+            clock.text = com.mtv.launcher.Fonts.time(context, now)
             date.text = DateFormat.format("EEEE, d MMMM", now).toString() + weatherText
             ticker.setSegments(Ticker.build(context, now.time, cfg.showF1))
             main.postDelayed(this, 1000 - System.currentTimeMillis() % 1000 + 5)

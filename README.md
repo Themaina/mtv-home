@@ -147,3 +147,7 @@ Known actions (prefix `com.toptech.tv.`): `ACTION_TV`, `ACTION_HDMI_1..3`, `ACTI
 Some budget TVs advertise Bluetooth but ship without the radio or Android's Bluetooth service. If your
 TV supports USB audio, a USB Bluetooth audio transmitter that shows up as a sound card is the
 workaround: it pairs with the speaker itself.
+
+## Credits
+
+Clock and countdown type: [Inter](https://github.com/rsms/inter) by Rasmus Andersson, SIL Open Font License 1.1 (see `docs/licenses/Inter-OFL.txt`).

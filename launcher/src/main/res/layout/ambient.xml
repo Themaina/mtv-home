@@ -42,17 +42,17 @@
                 android:id="@+id/amb_clock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-thin"
                 android:includeFontPadding="false"
                 android:shadowColor="#99000000"
-                android:shadowRadius="12"
+                android:shadowRadius="14"
                 android:textColor="#FFFFFFFF"
-                android:textSize="66sp" />
+                android:textSize="84sp" />
 
             <TextView
                 android:id="@+id/amb_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
                 android:shadowColor="#99000000"
                 android:shadowRadius="8"
                 android:textColor="#E6FFFFFF"

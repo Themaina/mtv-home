@@ -53,9 +53,8 @@ class CountdownView @JvmOverloads constructor(context: Context, attrs: Attribute
                     TextView(context).apply {
                         textSize = numberSize
                         setTextColor(0xFFFFFFFF.toInt())
-                        typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+                        Fonts.clock(this, weight = 700, opticalSize = if (numberSize >= 24f) 32 else 20)
                         gravity = Gravity.CENTER
-                        includeFontPadding = false
                     }
                 }
                 inAnimation = AnimationUtils.loadAnimation(context, R.anim.digit_in)

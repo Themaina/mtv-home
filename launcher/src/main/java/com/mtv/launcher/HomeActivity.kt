@@ -130,6 +130,7 @@ class HomeActivity : Activity() {
         setContentView(R.layout.activity_home)
         rows = findViewById(R.id.rows)
         clock = findViewById(R.id.clock)
+        Fonts.clock(clock, weight = 650, opticalSize = 28, tracking = -0.01f)
         weatherView = findViewById(R.id.weather)
         bell = findViewById(R.id.bell)
         bellCount = findViewById(R.id.bell_count)
@@ -506,7 +507,7 @@ class HomeActivity : Activity() {
     }
 
     private fun updateClock() {
-        clock.text = DateFormat.getTimeFormat(this).format(Date())
+        clock.text = Fonts.time(this)
     }
 
     private fun registerCompat(receiver: BroadcastReceiver, filter: IntentFilter) {

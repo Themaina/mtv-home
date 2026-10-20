@@ -16,6 +16,16 @@ object MarketRepository {
         }.onFailure { Log.w("MarketRepository", "$symbol failed: ${it.message}") }.getOrNull()
     }
 
+    /** Chart ranges for the full-screen view: label to (Yahoo range, interval). */
+    val RANGES = linkedMapOf("1D" to ("1d" to "5m"), "5D" to ("5d" to "30m"), "1M" to ("1mo" to "1d"), "6M" to ("6mo" to "1d"), "1Y" to ("1y" to "1wk"))
+
+    /** Blocking. For "1D" on a currency, falls back to the last 24 hours. */
+    fun fetchRange(symbol: String, label: String, now: Long = System.currentTimeMillis()): Quote? {
+        if (label == "1D" && symbol.endsWith("=X")) return fetchOne(symbol, "5d", "1h", now, last24h = true)
+        val (range, interval) = RANGES[label] ?: return null
+        return fetchOne(symbol, range, interval, now)
+    }
+
     private fun fetchOne(symbol: String, range: String, interval: String, now: Long, last24h: Boolean = false): Quote? {
         val path = "/v8/finance/chart/${URLEncoder.encode(symbol, "UTF-8")}?range=$range&interval=$interval&includePrePost=false"
         val body = runCatching { Http.get("https://query1.finance.yahoo.com$path", userAgent = Http.APP_UA) }

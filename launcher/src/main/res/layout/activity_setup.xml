@@ -31,6 +31,11 @@
             <EditText android:id="@+id/setup_fx_pct" style="@style/SetupField" android:inputType="numberDecimal" />
             <TextView style="@style/SetupLabel" android:text="@string/setup_x_feeds" />
             <EditText android:id="@+id/setup_x_feeds" style="@style/SetupField" android:inputType="textUri|textMultiLine" />
+            <TextView style="@style/SetupLabel" android:text="@string/setup_calendar" />
+            <EditText android:id="@+id/setup_calendar" style="@style/SetupField" android:inputType="textUri" />
+            <TextView style="@style/SetupLabel" android:text="@string/setup_poly" />
+            <EditText android:id="@+id/setup_poly" style="@style/SetupField" android:inputType="text" />
+        <CheckBox android:id="@+id/setup_f1" style="@style/SetupCheck" android:text="@string/setup_f1" />
         <CheckBox android:id="@+id/setup_alerts" style="@style/SetupCheck" android:text="@string/setup_alerts" />
         <CheckBox android:id="@+id/setup_boot" style="@style/SetupCheck" android:text="@string/setup_boot" />
 

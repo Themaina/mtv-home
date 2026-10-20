@@ -36,14 +36,32 @@ Pass options after `bash -s --`, for example `… | bash -s -- --tv 192.168.1.20
 ## What's on the dashboard
 
 1. **Greeting and brief**: one line written like a person, e.g. *"Tesla is up 3.8% and SpaceX up 1.3% today.
-   The shilling is at 129.82 to the dollar. US market closes in 45m."*
+   The shilling is at 129.82 to the dollar. Next: Standup Today 9:30. United States GP: Qualifying Saturday 23:00."*
 2. **Latest from 𝕏**: posts from feeds you add (see below). Hidden until you add one.
-3. **Today**: markets with today's line, big YouTube and YouTube Music tiles, and the top story.
-4. **Your apps**: most recently used first.
-5. **Notifications**, **Top stories** (BBC, BBC Africa, Al Jazeera), **Big Tech** (The Verge, TechCrunch,
-   Ars Technica), **Inputs**, **All apps** and **Settings**.
+3. **Today**: markets with live charts, the next Grand Prix with a ticking countdown (a LIVE badge pulses
+   during sessions), big YouTube, YouTube Music and F1 TV tiles, and the top story.
+4. **Up next**: your Google Calendar for the next two weeks.
+5. **Your apps**, **Notifications**, **Polymarket** (your topics first, then what's trending),
+   **Top stories**, **Big Tech**, **Inputs**, **All apps** and **Settings**.
 
-Stories open in a full-screen reader that pulls the article text, so you can read with the remote.
+Everything opens into a full screen you drive with the remote:
+
+| Card | Opens |
+|---|---|
+| Markets | Watchlist with a big chart; move through 1D · 5D · 1M · 6M · 1Y |
+| F1 | Countdown, the race weekend in your time zone, Drivers · Teams · Season, Watch on F1 TV |
+| Polymarket | One market at a time with probability bars; ◀ ▶ browses, OK opens polymarket.com |
+| Up next | Your agenda by day |
+| Stories | A full-screen reader with the article text |
+
+Data comes from free public sources: Yahoo Finance (quotes), Jolpica (F1), Polymarket's Gamma API,
+BBC / Al Jazeera / The Verge / TechCrunch / Ars Technica (news) and Open-Meteo (weather).
+
+### Google Calendar
+
+In Google Calendar on the web: **Settings › (your calendar) › Integrate calendar › Secret address in iCal
+format**. Paste that link into **Personalize** on the TV, or give it to the installer with `--calendar`.
+Keep it private: anyone with the link can read that calendar.
 
 ### Market alerts
 

@@ -47,6 +47,20 @@ class UserConfig(context: Context) {
         get() = split(prefs.getString(KEY_X_FEEDS, ""), separators = "|\n ")
         set(v) = prefs.edit().putString(KEY_X_FEEDS, v.joinToString("|")).apply()
 
+    /** Private iCal links (Google Calendar: "Secret address in iCal format"). */
+    var calendarUrls: List<String>
+        get() = split(prefs.getString(KEY_ICS, ""), separators = "|\n ")
+        set(v) = prefs.edit().putString(KEY_ICS, v.joinToString("|")).apply()
+
+    /** Polymarket searches shown before the trending markets. */
+    var polyTopics: List<String>
+        get() = split(prefs.getString(KEY_POLY, DEFAULT_POLY), separators = ",;")
+        set(v) = prefs.edit().putString(KEY_POLY, v.joinToString(",")).apply()
+
+    var showF1: Boolean
+        get() = prefs.getBoolean(KEY_F1, true)
+        set(v) = prefs.edit().putBoolean(KEY_F1, v).apply()
+
     fun registerListener(l: SharedPreferences.OnSharedPreferenceChangeListener) = prefs.registerOnSharedPreferenceChangeListener(l)
     fun unregisterListener(l: SharedPreferences.OnSharedPreferenceChangeListener) = prefs.unregisterOnSharedPreferenceChangeListener(l)
 
@@ -63,6 +77,10 @@ class UserConfig(context: Context) {
         private const val KEY_ALERTS = "alerts"
         private const val KEY_BOOT_HOME = "boot_home"
         private const val KEY_X_FEEDS = "x_feeds"
+        private const val KEY_ICS = "calendar_urls"
+        private const val KEY_POLY = "poly_topics"
+        private const val KEY_F1 = "show_f1"
+        const val DEFAULT_POLY = "Tesla,SpaceX,F1"
         const val DEFAULT_CITY = "Nairobi"
         const val DEFAULT_WATCHLIST = "TSLA,SPCX,USDKES=X"
     }

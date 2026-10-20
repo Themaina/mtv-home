@@ -2,7 +2,10 @@ package com.mtv.launcher
 
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import com.mtv.launcher.cal.CalEvent
+import com.mtv.launcher.f1.F1Race
 import com.mtv.launcher.market.Quote
+import com.mtv.launcher.poly.PolyEvent
 import com.mtv.launcher.news.Story
 import com.mtv.launcher.notify.Note
 
@@ -45,7 +48,20 @@ data class MarketsCard(val quotes: List<Quote>, val status: String) : Card {
     override val key: String get() = "markets"
 }
 
-enum class Brand { YOUTUBE, YOUTUBE_MUSIC }
+/** Next Grand Prix with a live countdown. */
+data class F1Card(val race: F1Race) : Card {
+    override val key: String get() = "f1:${race.season}:${race.round}"
+}
+
+data class PolyCard(val event: PolyEvent) : Card {
+    override val key: String get() = "poly:${event.id}"
+}
+
+data class EventCard(val event: CalEvent) : Card {
+    override val key: String get() = "cal:${event.start}:${event.title}"
+}
+
+enum class Brand { YOUTUBE, YOUTUBE_MUSIC, F1TV }
 
 data class BigAppCard(
     override val key: String,

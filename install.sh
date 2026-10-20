@@ -11,6 +11,7 @@
 #   --name NAME           your name for the greeting
 #   --city CITY           city for the weather
 #   --watchlist A,B,C     Yahoo Finance symbols, e.g. TSLA,SPCX,USDKES=X
+#   --calendar URL        Google Calendar "Secret address in iCal format" (optional)
 #   --apk FILE            install a local APK instead of the latest GitHub release
 #   --no-launch           don't switch the TV to the dashboard at the end
 #   --yes                 accept defaults, never prompt
@@ -26,13 +27,14 @@ WORK="$HOME/.mtv"
 # Everything runs inside main(), called on the last line: under `curl | bash` this makes bash read
 # the whole script before running any of it, so commands that read stdin can't eat the script.
 main() {
-TV="${TV_ADDR:-}"; NAME=""; CITY=""; WATCHLIST=""; APK=""; LAUNCH=1; YES=""; UNINSTALL=""
+TV="${TV_ADDR:-}"; NAME=""; CITY=""; WATCHLIST=""; CALENDAR=""; APK=""; LAUNCH=1; YES=""; UNINSTALL=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --tv) TV="$2"; shift ;;
     --name) NAME="$2"; shift ;;
     --city) CITY="$2"; shift ;;
     --watchlist) WATCHLIST="$2"; shift ;;
+    --calendar) CALENDAR="$2"; shift ;;
     --apk) APK="$2"; shift ;;
     --no-launch) LAUNCH="" ;;
     --yes|-y) YES=1 ;;
@@ -170,11 +172,13 @@ if [ "$WAS_INSTALLED" != 1 ]; then
   [ -n "$NAME" ] || NAME=$(ask "Your name" "")
   [ -n "$CITY" ] || CITY=$(ask "City for weather" "Nairobi")
   [ -n "$WATCHLIST" ] || WATCHLIST=$(ask "Stocks and currencies to watch (Yahoo symbols)" "TSLA,SPCX,USDKES=X")
+  [ -n "$CALENDAR" ] || CALENDAR=$(ask "Google Calendar secret iCal link (Enter to skip)" "")
 fi
 EXTRAS=()
 [ -n "$NAME" ] && EXTRAS+=(--es name "'$NAME'")
 [ -n "$CITY" ] && EXTRAS+=(--es city "'$CITY'")
 [ -n "$WATCHLIST" ] && EXTRAS+=(--es watchlist "'$WATCHLIST'")
+[ -n "$CALENDAR" ] && EXTRAS+=(--es calendar "'$CALENDAR'")
 [ ${#EXTRAS[@]} -gt 0 ] || info "Keeping your existing settings."
 # Always sent (even with no settings): it also starts the market watcher.
 if true; then

@@ -125,7 +125,7 @@ object TileSources {
     }
 
     /** Apps given big cards in the "Today" row, so they're left out of "Your apps". */
-    val FEATURED_PACKAGES = setOf(YOUTUBE, YOUTUBE_TIZENTUBE, YOUTUBE_MUSIC)
+    val FEATURED_PACKAGES = setOf(YOUTUBE, YOUTUBE_TIZENTUBE, YOUTUBE_MUSIC, F1TV)
 
     /** Big YouTube and YouTube Music cards. Music offers the Play Store when it isn't installed. */
     fun featured(ctx: Context): List<BigAppCard> {
@@ -147,9 +147,11 @@ object TileSources {
                 null,
             )
         }
+        launchIntent(F1TV)?.let { cards += BigAppCard("big:f1tv", Brand.F1TV, ctx.getString(R.string.f1tv_sub), ctx.getString(R.string.f1tv_open), it, F1TV) }
         return cards
     }
 
+    private const val F1TV = "com.formulaone.production"
     private const val YOUTUBE = "com.google.android.youtube.tv"
     private const val YOUTUBE_TIZENTUBE = "io.gh.reisxd.tizentube.cobalt"
     private const val YOUTUBE_MUSIC = "com.google.android.youtube.tvmusic"

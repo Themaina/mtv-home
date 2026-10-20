@@ -23,6 +23,8 @@ object Brief {
         now: Long,
         latestAlert: MarketAlert? = null,
         appInNews: Pair<String, String>? = null,
+        f1Line: String? = null,
+        nextEvent: String? = null,
     ): String {
         val parts = mutableListOf<String>()
 
@@ -45,6 +47,8 @@ object Brief {
 
         stocks.firstOrNull()?.let { q -> marketTiming(q, now)?.let { parts += it } }
 
+        nextEvent?.let { parts += it }
+        f1Line?.let { parts += it }
         appInNews?.let { (app, headline) -> parts += "$app is in the news: $headline" }
         return parts.joinToString(" ")
     }

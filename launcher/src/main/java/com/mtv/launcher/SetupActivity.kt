@@ -22,6 +22,9 @@ class SetupActivity : Activity() {
         val stockPct: EditText = findViewById(R.id.setup_stock_pct)
         val fxPct: EditText = findViewById(R.id.setup_fx_pct)
         val xFeeds: EditText = findViewById(R.id.setup_x_feeds)
+        val calendar: EditText = findViewById(R.id.setup_calendar)
+        val poly: EditText = findViewById(R.id.setup_poly)
+        val f1: CheckBox = findViewById(R.id.setup_f1)
         val alerts: CheckBox = findViewById(R.id.setup_alerts)
         val boot: CheckBox = findViewById(R.id.setup_boot)
         val save: TextView = findViewById(R.id.setup_save)
@@ -32,6 +35,9 @@ class SetupActivity : Activity() {
         stockPct.setText(fmt(cfg.stockAlertPct))
         fxPct.setText(fmt(cfg.fxAlertPct))
         xFeeds.setText(cfg.xFeeds.joinToString("\n"))
+        calendar.setText(cfg.calendarUrls.joinToString(" "))
+        poly.setText(cfg.polyTopics.joinToString(", "))
+        f1.isChecked = cfg.showF1
         alerts.isChecked = cfg.alertsEnabled
         boot.isChecked = cfg.bootToHome
 
@@ -43,6 +49,9 @@ class SetupActivity : Activity() {
             stockPct.text.toString().toDoubleOrNull()?.let { cfg.stockAlertPct = it }
             fxPct.text.toString().toDoubleOrNull()?.let { cfg.fxAlertPct = it }
             cfg.xFeeds = xFeeds.text.toString().split("\n", " ").map { it.trim() }.filter { it.startsWith("http") }
+            cfg.calendarUrls = calendar.text.toString().split(" ", "\n").map { it.trim() }.filter { it.startsWith("http") }
+            cfg.polyTopics = poly.text.toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+            cfg.showF1 = f1.isChecked
             cfg.alertsEnabled = alerts.isChecked
             cfg.bootToHome = boot.isChecked
             finish()

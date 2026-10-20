@@ -20,7 +20,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.mtv.launcher.cal.IcsCalendar
 import com.mtv.launcher.config.UserConfig
+import com.mtv.launcher.f1.F1Repository
+import com.mtv.launcher.poly.PolymarketRepository
 import com.mtv.launcher.img.ImageLoader
 import com.mtv.launcher.market.MarketHub
 import com.mtv.launcher.market.MarketService
@@ -35,6 +38,7 @@ import com.mtv.launcher.notify.NotificationHub
 import com.mtv.launcher.weather.WeatherRepository
 import java.util.Calendar
 import java.util.Date
+import java.time.ZoneId
 import java.util.concurrent.Executors
 
 /** The personal dashboard: what the TV shows on HOME and after it starts. */
@@ -67,6 +71,12 @@ class HomeActivity : Activity() {
     private var newsRefreshing = false
     private var lastWeatherAt = 0L
     private var lastPostsAt = 0L
+    private var lastF1At = 0L
+    private var lastPolyAt = 0L
+    private var lastCalAt = 0L
+    private var animatedIn = false
+    private val extraIo = Executors.newFixedThreadPool(2)
+    private val dataListener: () -> Unit = { publish(refocus = false) }
 
     private val reloadRunnable = Runnable { reloadTiles() }
     private val ticker = object : Runnable {
@@ -101,6 +111,8 @@ class HomeActivity : Activity() {
     private val configListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
         lastWeatherAt = 0L
         lastPostsAt = 0L
+        lastPolyAt = 0L
+        lastCalAt = 0L
         MarketService.start(this, refresh = true)
         refreshNetworkData()
         publish(refocus = false)
@@ -133,6 +145,7 @@ class HomeActivity : Activity() {
         })
         NotificationHub.observe(noteListener)
         MarketHub.observe(marketListener)
+        DataHub.observe(dataListener)
         config.registerListener(configListener)
         MarketService.start(this)
 
@@ -182,7 +195,9 @@ class HomeActivity : Activity() {
         unregisterReceiver(packageReceiver)
         NotificationHub.stopObserving(noteListener)
         MarketHub.stopObserving(marketListener)
+        DataHub.stopObserving(dataListener)
         config.unregisterListener(configListener)
+        extraIo.shutdownNow()
         tilesIo.shutdownNow()
         netIo.shutdownNow()
     }
@@ -228,6 +243,25 @@ class HomeActivity : Activity() {
                 main.post { weather = w; updateWeather() }
             }
         }
+        if (config.showF1 && now - lastF1At > 3 * 3_600_000L) {
+            lastF1At = now
+            extraIo.execute { runCatching { F1Repository.fetch() }.getOrNull()?.let { DataHub.f1 = it; DataHub.changed() } }
+        }
+        if (now - lastPolyAt > 10 * 60_000L) {
+            lastPolyAt = now
+            val topics = config.polyTopics
+            extraIo.execute { runCatching { PolymarketRepository.fetch(topics) }.getOrNull()?.takeIf { it.isNotEmpty() }?.let { DataHub.poly = it; DataHub.changed() } }
+        }
+        val calendars = config.calendarUrls
+        if (calendars.isNotEmpty() && now - lastCalAt > 15 * 60_000L) {
+            lastCalAt = now
+            extraIo.execute {
+                DataHub.events = IcsCalendar.upcoming(calendars, ZoneId.systemDefault(), System.currentTimeMillis())
+                DataHub.changed()
+            }
+        } else if (calendars.isEmpty() && DataHub.events.isNotEmpty()) {
+            DataHub.events = emptyList()
+        }
         val feeds = config.xFeeds
         if (feeds.isNotEmpty() && now - lastPostsAt > 10 * 60_000L) {
             lastPostsAt = now
@@ -263,11 +297,14 @@ class HomeActivity : Activity() {
         val header = HeaderRow(
             greeting = Brief.greeting(config.name, hour),
             subtitle = DateFormat.format("EEEE, d MMMM", Date(now)).toString(),
-            brief = Brief.build(quotes, now, MarketHub.recentAlerts.firstOrNull(), appInNews(snapshot)),
+            brief = Brief.build(quotes, now, MarketHub.recentAlerts.firstOrNull(), appInNews(snapshot), f1Line(now), nextEventLine(now)),
         )
+        val race = if (config.showF1) DataHub.f1?.next(now) else null
+        val events = DataHub.events.filter { it.end > now }.take(10)
 
         val today = buildList<Card> {
             if (config.watchlist.isNotEmpty()) add(MarketsCard(quotes, marketStatus(now)))
+            race?.let { add(F1Card(it)) }
             addAll(TileSources.featured(this@HomeActivity))
             (snapshot?.top.orEmpty() + snapshot?.tech.orEmpty()).firstOrNull { it.imageUrl != null }?.let { add(TopStoryCard(it)) }
         }
@@ -276,8 +313,10 @@ class HomeActivity : Activity() {
             add(header)
             if (posts.isNotEmpty()) add(CardRow(KEY_X, getString(R.string.section_x), posts.map(::PostCard)))
             add(CardRow(KEY_TODAY, getString(R.string.section_today), today))
+            if (events.isNotEmpty()) add(CardRow("calendar", getString(R.string.section_calendar), events.map(::EventCard)))
             add(CardRow(KEY_APPS, getString(R.string.section_your_apps), recent.take(DOCK_SIZE)))
             if (notes.isNotEmpty()) add(CardRow("notes", getString(R.string.section_notifications), notes.map(::NoteCard)))
+            DataHub.poly.takeIf { it.isNotEmpty() }?.let { add(CardRow("poly", getString(R.string.section_poly), it.map(::PolyCard))) }
             snapshot?.top?.takeIf { it.isNotEmpty() }?.let { add(CardRow("news", getString(R.string.section_news), it.map(::StoryCard))) }
             snapshot?.tech?.takeIf { it.isNotEmpty() }?.let { add(CardRow("tech", getString(R.string.section_tech), it.map(::StoryCard))) }
             if (inputs.isNotEmpty()) add(CardRow("inputs", getString(R.string.section_inputs), inputs))
@@ -286,7 +325,36 @@ class HomeActivity : Activity() {
             }
             if (settings.isNotEmpty()) add(CardRow("settings", getString(R.string.section_settings), settings))
         }
-        adapter.submitList(list) { if (refocus) focusFirst() }
+        adapter.submitList(list) {
+            if (refocus) focusFirst()
+            if (!animatedIn) {
+                animatedIn = true
+                rows.layoutAnimation = android.view.animation.LayoutAnimationController(
+                    android.view.animation.AnimationUtils.loadAnimation(this, R.anim.row_enter), 0.12f,
+                )
+                rows.scheduleLayoutAnimation()
+            }
+        }
+    }
+
+    /** "The United States GP is Sunday 23:00." during race week, or "Qualifying is live now." */
+    private fun f1Line(now: Long): String? {
+        val race = (if (config.showF1) DataHub.f1?.next(now) else null) ?: return null
+        Format.liveSession(race, now)?.let { return "${it.label} is live now at the ${race.shortName}." }
+        val days = (race.raceStart - now) / 86_400_000L
+        if (days > 7) return null
+        val next = Format.nextSession(race, now)
+        return if (next != null && next.label != "Race") {
+            "${race.shortName}: ${next.label} ${Format.relativeDay(this, next.start)}."
+        } else {
+            "The ${race.shortName} is ${Format.relativeDay(this, race.raceStart)}."
+        }
+    }
+
+    /** "Next: Standup at 9:30." when something is coming up in the next 12 hours. */
+    private fun nextEventLine(now: Long): String? {
+        val ev = DataHub.events.firstOrNull { it.start > now && !it.allDay && it.start - now < 12 * 3_600_000L } ?: return null
+        return "Next: ${ev.title} ${Format.relativeDay(this, ev.start)}."
     }
 
     private fun marketStatus(now: Long): String {
@@ -343,7 +411,10 @@ class HomeActivity : Activity() {
             is TopStoryCard -> openStory(card.story)
             is PostCard -> openStory(card.story)
             is NoteCard -> openNote(card.note)
-            is MarketsCard -> MarketService.start(this, refresh = true)
+            is MarketsCard -> startActivity(Intent(this, MarketsActivity::class.java))
+            is F1Card -> startActivity(Intent(this, F1Activity::class.java))
+            is PolyCard -> startActivity(PolyActivity.intent(this, card.event.id))
+            is EventCard -> startActivity(Intent(this, AgendaActivity::class.java))
         }
     }
 

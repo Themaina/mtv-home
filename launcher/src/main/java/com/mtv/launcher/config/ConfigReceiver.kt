@@ -23,6 +23,9 @@ class ConfigReceiver : BroadcastReceiver() {
         intent.getStringExtra("fx_alert_pct")?.toDoubleOrNull()?.let { cfg.fxAlertPct = it }
         intent.getStringExtra("alerts")?.toBooleanStrictOrNull()?.let { cfg.alertsEnabled = it }
         intent.getStringExtra("boot_home")?.toBooleanStrictOrNull()?.let { cfg.bootToHome = it }
+        intent.getStringExtra("calendar")?.let { cfg.calendarUrls = it.split("|").map(String::trim).filter(String::isNotEmpty) }
+        intent.getStringExtra("poly_topics")?.let { cfg.polyTopics = it.split(",").map(String::trim).filter(String::isNotEmpty) }
+        intent.getStringExtra("show_f1")?.toBooleanStrictOrNull()?.let { cfg.showF1 = it }
         intent.getStringExtra("x_feeds")?.let { cfg.xFeeds = it.split("|").map(String::trim).filter(String::isNotEmpty) }
         Log.i("ConfigReceiver", "configured: name=${cfg.name} city=${cfg.city} watchlist=${cfg.watchlist}")
         // The installer can't start the (unexported) watcher itself; this broadcast does it.

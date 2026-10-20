@@ -80,6 +80,15 @@
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize" />
 
+        <activity android:name=".F1Activity" android:exported="false" android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|smallestScreenSize|uiMode" />
+        <activity android:name=".PolyActivity" android:exported="false" android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|smallestScreenSize|uiMode" />
+        <activity android:name=".MarketsActivity" android:exported="false" android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|smallestScreenSize|uiMode" />
+        <activity android:name=".AgendaActivity" android:exported="false" android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|smallestScreenSize|uiMode" />
+
         <service
             android:name=".market.MarketService"
             android:exported="false"

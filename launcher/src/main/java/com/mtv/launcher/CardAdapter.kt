@@ -29,6 +29,9 @@ class CardAdapter(
         is NoteCard -> R.layout.item_note
         is MarketsCard -> R.layout.item_markets
         is BigAppCard -> R.layout.item_bigapp
+        is F1Card -> R.layout.item_f1
+        is PolyCard -> R.layout.item_poly
+        is EventCard -> R.layout.item_event
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
@@ -40,6 +43,9 @@ class CardAdapter(
             R.layout.item_post -> PostHolder(view)
             R.layout.item_markets -> MarketsHolder(view)
             R.layout.item_bigapp -> BigAppHolder(view)
+            R.layout.item_f1 -> F1Holder(view)
+            R.layout.item_poly -> PolyHolder(view)
+            R.layout.item_event -> EventHolder(view)
             else -> NoteHolder(view)
         }
     }
@@ -168,6 +174,7 @@ class CardAdapter(
     inner class MarketsHolder(itemView: View) : Holder(itemView, R.id.card) {
         private val status: TextView = itemView.findViewById(R.id.markets_status)
         private val rows: LinearLayout = itemView.findViewById(R.id.markets_rows)
+        private val lastPrices = HashMap<String, Double>()
 
         override fun bindCard(item: Card) {
             val markets = item as MarketsCard
@@ -184,7 +191,17 @@ class CardAdapter(
                 line.findViewById<TextView>(R.id.m_symbol).text = if (q.isFx) q.name else q.symbol
                 line.findViewById<TextView>(R.id.m_name).text = when { q.symbol == "USDKES=X" -> itemView.context.getString(R.string.fx_per_dollar); q.isFx -> "Currency"; else -> q.name }
                 line.findViewById<SparklineView>(R.id.m_spark).set(q.points, color)
-                line.findViewById<TextView>(R.id.m_price).text = AlertEngine.formatPrice(q)
+                line.findViewById<TextView>(R.id.m_price).apply {
+                    text = AlertEngine.formatPrice(q)
+                    // Flash the price green or red when it ticks.
+                    val before = lastPrices.put(q.symbol, q.price)
+                    if (before != null && before != q.price) {
+                        setTextColor(if (q.price > before) GREEN else RED)
+                        animate().cancel()
+                        scaleX = 1.12f; scaleY = 1.12f
+                        animate().scaleX(1f).scaleY(1f).setDuration(600).withEndAction { setTextColor(0xFFFFFFFF.toInt()) }.start()
+                    }
+                }
                 line.findViewById<TextView>(R.id.m_change).apply {
                     text = "%s %.2f%%".format(Locale.US, if (up) "▲" else "▼", abs(q.changePct))
                     setTextColor(color)
@@ -205,6 +222,7 @@ class CardAdapter(
             val (logoRes, label, colors) = when (big.brand) {
                 Brand.YOUTUBE -> Triple(R.drawable.ic_yt, "YouTube", intArrayOf(0xFF3A0A12.toInt(), 0xFF120406.toInt()))
                 Brand.YOUTUBE_MUSIC -> Triple(R.drawable.ic_ytm, "Music", intArrayOf(0xFF242424.toInt(), 0xFF0A0A0A.toInt()))
+                Brand.F1TV -> Triple(R.drawable.ic_f1, "F1 TV", intArrayOf(0xFF6E0A0A.toInt(), 0xFF1A0505.toInt()))
             }
             focusView.background = GradientDrawable(GradientDrawable.Orientation.TL_BR, colors).apply {
                 cornerRadius = itemView.context.dp(12).toFloat()
@@ -214,6 +232,81 @@ class CardAdapter(
             sub.text = big.subtitle
             action.text = big.action
             focusView.contentDescription = big.action
+        }
+    }
+
+
+    inner class F1Holder(itemView: View) : Holder(itemView, R.id.card) {
+        private val round: TextView = itemView.findViewById(R.id.f1_round)
+        private val name: TextView = itemView.findViewById(R.id.f1_name)
+        private val where: TextView = itemView.findViewById(R.id.f1_where)
+        private val countdown: CountdownView = itemView.findViewById<CountdownView>(R.id.f1_countdown).apply { setStyle(16f, 7f) }
+        private val next: TextView = itemView.findViewById(R.id.f1_next_session)
+        private val liveDot: View = itemView.findViewById(R.id.f1_live_dot)
+        private val live: TextView = itemView.findViewById(R.id.f1_live)
+
+        override fun bindCard(item: Card) {
+            val race = (item as F1Card).race
+            val ctx = itemView.context
+            val now = System.currentTimeMillis()
+            round.text = ctx.getString(R.string.f1_round, race.round)
+            name.text = race.shortName
+            where.text = listOf(race.circuit, race.country).filter { it.isNotBlank() }.joinToString(" · ")
+            val liveNow = Format.liveSession(race, now)
+            val upcoming = Format.nextSession(race, now)
+            countdown.setTarget(race.raceStart)
+            next.text = when {
+                liveNow != null -> ctx.getString(R.string.f1_live_now, liveNow.label)
+                upcoming != null -> "${upcoming.label} · ${Format.dayTime(ctx, upcoming.start)}"
+                else -> ""
+            }
+            val showLive = liveNow != null
+            liveDot.visibility = if (showLive) View.VISIBLE else View.GONE
+            live.visibility = liveDot.visibility
+            liveDot.animate().cancel()
+            if (showLive) pulse(liveDot)
+            focusView.contentDescription = "${race.name}, ${next.text}"
+        }
+
+        private fun pulse(v: View) {
+            v.alpha = 1f
+            v.animate().alpha(0.2f).setDuration(700).withEndAction {
+                v.animate().alpha(1f).setDuration(700).withEndAction { if (v.visibility == View.VISIBLE && v.isAttachedToWindow) pulse(v) }.start()
+            }.start()
+        }
+    }
+
+    inner class PolyHolder(itemView: View) : Holder(itemView, R.id.card) {
+        private val icon: ImageView = itemView.findViewById(R.id.poly_icon)
+        private val topic: TextView = itemView.findViewById(R.id.poly_topic)
+        private val volume: TextView = itemView.findViewById(R.id.poly_volume)
+        private val title: TextView = itemView.findViewById(R.id.poly_title)
+        private val outcomes: LinearLayout = itemView.findViewById(R.id.poly_outcomes)
+
+        override fun bindCard(item: Card) {
+            val e = (item as PolyCard).event
+            val ctx = itemView.context
+            title.text = e.title
+            topic.text = e.topic ?: ctx.getString(R.string.trending)
+            volume.text = ctx.getString(R.string.poly_volume, Format.money(e.volume24h))
+            ImageLoader.load(e.image, icon, ctx.dp(18), ctx.dp(18))
+            bindOutcomes(outcomes, e.outcomes.take(2), animate = true)
+            focusView.contentDescription = e.title
+        }
+    }
+
+    inner class EventHolder(itemView: View) : Holder(itemView, R.id.card) {
+        private val whenView: TextView = itemView.findViewById(R.id.ev_when)
+        private val title: TextView = itemView.findViewById(R.id.ev_title)
+        private val where: TextView = itemView.findViewById(R.id.ev_where)
+
+        override fun bindCard(item: Card) {
+            val ev = (item as EventCard).event
+            whenView.text = Format.relativeDay(itemView.context, ev.start, ev.allDay)
+            title.text = ev.title
+            where.text = ev.location
+            where.visibility = if (ev.location.isBlank()) View.GONE else View.VISIBLE
+            focusView.contentDescription = "${whenView.text}: ${ev.title}"
         }
     }
 
@@ -230,8 +323,31 @@ class CardAdapter(
         }
     }
 
-    private companion object {
+    companion object {
         const val GREEN = 0xFF30D158.toInt()
         const val RED = 0xFFFF453A.toInt()
+
+        /** Outcome rows with probability bars that grow in. Shared by the card and the detail screen. */
+        fun bindOutcomes(container: LinearLayout, list: List<com.mtv.launcher.poly.Outcome>, animate: Boolean) {
+            val inflater = LayoutInflater.from(container.context)
+            while (container.childCount < list.size) container.addView(inflater.inflate(R.layout.item_outcome, container, false))
+            while (container.childCount > list.size) container.removeViewAt(container.childCount - 1)
+            list.forEachIndexed { i, o ->
+                val row = container.getChildAt(i)
+                row.findViewById<TextView>(R.id.o_label).text = o.label
+                row.findViewById<TextView>(R.id.o_pct).text = Format.pct(o.probability)
+                val bar = row.findViewById<View>(R.id.o_bar)
+                bar.pivotX = 0f
+                val target = o.probability.toFloat().coerceIn(0.01f, 1f)
+                bar.animate().cancel()
+                if (animate) {
+                    bar.scaleX = 0f
+                    bar.animate().scaleX(target).setStartDelay(80L * i).setDuration(650).start()
+                } else {
+                    bar.scaleX = target
+                }
+                bar.alpha = if (i == 0) 1f else 0.55f
+            }
+        }
     }
 }

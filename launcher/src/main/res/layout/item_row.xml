@@ -10,7 +10,7 @@
         android:id="@+id/row_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="44dp"
         android:layout_marginTop="14dp"
         android:textColor="#CCFFFFFF"
         android:textSize="17sp"
@@ -22,8 +22,8 @@
         android:layout_height="wrap_content"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:paddingStart="25dp"
+        android:paddingStart="37dp"
         android:paddingTop="4dp"
-        android:paddingEnd="25dp"
+        android:paddingEnd="37dp"
         android:scrollbars="none" />
 </LinearLayout>

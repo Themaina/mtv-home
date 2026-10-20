@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/card"
         android:layout_width="match_parent"
-        android:layout_height="142dp"
+        android:layout_height="150dp"
         android:background="@drawable/np_bg"
         android:focusable="true"
         android:foreground="@drawable/tile_bg"
@@ -31,7 +31,7 @@
                 android:maxLines="1"
                 android:textAllCaps="true"
                 android:textColor="#B3FFFFFF"
-                android:textSize="8sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -107,6 +107,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:textColor="#99FFFFFF"
-            android:textSize="9sp" />
+            android:textSize="10.5sp" />
     </LinearLayout>
 </FrameLayout>

@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFD60A"
-                android:textSize="9sp"
+                android:textSize="10.5sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -53,7 +53,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="#99FFFFFF"
-                android:textSize="9sp" />
+                android:textSize="10.5sp" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

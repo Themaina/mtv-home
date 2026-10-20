@@ -11,23 +11,34 @@
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:paddingBottom="120dp"
+        android:paddingBottom="140dp"
         android:scrollbars="none" />
 
-    <!-- Finance-channel ticker pinned to the bottom. -->
-    <FrameLayout
+    <!-- Finance-channel ticker pinned to the bottom: a short fade, then a solid band so nothing shows through. -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="46dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@drawable/ticker_bg">
+        android:orientation="vertical">
 
-        <com.mtv.launcher.TickerView
-            android:id="@+id/ticker"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="8dp" />
-    </FrameLayout>
+            android:layout_height="22dp"
+            android:background="@drawable/ticker_fade" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#FF05070B">
+
+            <com.mtv.launcher.TickerView
+                android:id="@+id/ticker"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:layout_gravity="top"
+                android:layout_marginTop="4dp" />
+        </FrameLayout>
+    </LinearLayout>
 
     <!-- Fades content scrolling under the clock. -->
     <View
@@ -41,8 +52,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
-        android:layout_marginTop="18dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="44dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -74,7 +85,7 @@
             android:minWidth="16dp"
             android:paddingHorizontal="4dp"
             android:textColor="#FFFFFFFF"
-            android:textSize="9sp"
+            android:textSize="10.5sp"
             android:textStyle="bold"
             android:visibility="gone" />
 

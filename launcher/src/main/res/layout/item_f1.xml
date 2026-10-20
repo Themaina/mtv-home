@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/card"
         android:layout_width="match_parent"
-        android:layout_height="142dp"
+        android:layout_height="150dp"
         android:background="@drawable/f1_card_bg"
         android:focusable="true"
         android:foreground="@drawable/tile_bg"
@@ -37,7 +37,7 @@
                 android:letterSpacing="0.08"
                 android:textAllCaps="true"
                 android:textColor="#B3FFFFFF"
-                android:textSize="8sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <View
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/live"
                 android:textColor="#FFFF1E1E"
-                android:textSize="8sp"
+                android:textSize="10sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
         </LinearLayout>
@@ -77,7 +77,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="#99FFFFFF"
-            android:textSize="9sp" />
+            android:textSize="10.5sp" />
 
         <com.mtv.launcher.CountdownView
             android:id="@+id/f1_countdown"
@@ -93,6 +93,6 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="#D9FFFFFF"
-            android:textSize="9sp" />
+            android:textSize="10.5sp" />
     </LinearLayout>
 </FrameLayout>

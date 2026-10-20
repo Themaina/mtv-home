@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingStart="32dp"
-    android:paddingTop="16dp"
-    android:paddingEnd="32dp">
+    android:paddingStart="44dp"
+    android:paddingTop="24dp"
+    android:paddingEnd="44dp">
 
     <TextView
         android:id="@+id/header_greeting"

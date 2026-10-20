@@ -25,7 +25,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="#9EFFFFFF"
-            android:textSize="9sp" />
+            android:textSize="10.5sp" />
     </LinearLayout>
 
     <com.mtv.launcher.SparklineView
@@ -52,6 +52,6 @@
             android:id="@+id/m_change"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="9sp" />
+            android:textSize="10.5sp" />
     </LinearLayout>
 </LinearLayout>

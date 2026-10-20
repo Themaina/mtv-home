@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/poly_hint"
-            android:textColor="#80FFFFFF"
+            android:textColor="#A6FFFFFF"
             android:textSize="11sp" />
     </LinearLayout>
 </FrameLayout>

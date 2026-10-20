@@ -4,9 +4,9 @@
     android:layout_height="match_parent"
     android:background="@drawable/dash_bg"
     android:orientation="horizontal"
-    android:paddingStart="32dp"
+    android:paddingStart="44dp"
     android:paddingTop="24dp"
-    android:paddingEnd="32dp"
+    android:paddingEnd="44dp"
     android:paddingBottom="20dp">
 
     <LinearLayout

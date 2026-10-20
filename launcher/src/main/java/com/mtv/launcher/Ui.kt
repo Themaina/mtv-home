@@ -17,7 +17,9 @@ fun Bitmap.toBackdrop(): Bitmap = Bitmap.createScaledBitmap(this, 48, 27, true)
 
 /** tvOS-like focus: lift, grow and cast a shadow; caption fades in when [caption] is given. */
 fun View.applyFocusLift(focused: Boolean, animate: Boolean, caption: View? = null, captionVisible: Boolean = true) {
-    val scale = if (focused) 1.08f else 1f
+    // Wide cards grow less so they don't push into their neighbours (TV focus range 1.025–1.1).
+    val grow = if (width > context.dp(200)) 1.04f else 1.08f
+    val scale = if (focused) grow else 1f
     val lift = if (focused) context.dp(10).toFloat() else 0f
     (parent as? View)?.translationZ = if (focused) 1f else 0f
     if (animate) {

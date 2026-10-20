@@ -128,7 +128,7 @@ Without it, builds use the debug key.
 | `launcher/.../config/` | Personal settings, and the installer's adb hook |
 | `install.sh` | The one-command installer |
 | `app/` | Hello-world sandbox used to prove the build pipeline |
-| `docs/` | TV survey and the dashboard design |
+| `docs/` | TV survey, dashboard design and the [TV guidelines audit](docs/design/tv-guidelines-audit.md) |
 
 ### Toptech input switching
 

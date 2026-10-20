@@ -242,7 +242,7 @@ class CardAdapter(
         private val round: TextView = itemView.findViewById(R.id.f1_round)
         private val name: TextView = itemView.findViewById(R.id.f1_name)
         private val where: TextView = itemView.findViewById(R.id.f1_where)
-        private val countdown: CountdownView = itemView.findViewById<CountdownView>(R.id.f1_countdown).apply { setStyle(16f, 7f) }
+        private val countdown: CountdownView = itemView.findViewById<CountdownView>(R.id.f1_countdown).apply { setStyle(17f, 9.5f) }
         private val next: TextView = itemView.findViewById(R.id.f1_next_session)
         private val liveDot: View = itemView.findViewById(R.id.f1_live_dot)
         private val live: TextView = itemView.findViewById(R.id.f1_live)

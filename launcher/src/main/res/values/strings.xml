@@ -36,7 +36,7 @@
     <string name="setup_boot">Open the dashboard when the TV starts</string>
     <string name="save">Save</string>
     <string name="top_story_label">Top story · %1$s</string>
-    <string name="fx_per_dollar">Shilling per dollar</string>
+    <string name="fx_per_dollar">KES per USD</string>
     <string name="markets_live">Live · %1$s</string>
     <string name="markets_closed">Closed · %1$s</string>
     <string name="markets_loading">Loading…</string>

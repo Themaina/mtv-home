@@ -29,6 +29,7 @@ import com.mtv.launcher.market.MarketHub
 import com.mtv.launcher.market.MarketService
 import com.mtv.launcher.news.NewsRepository
 import com.mtv.launcher.news.Story
+import com.mtv.launcher.weather.WeatherRepository
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
@@ -57,6 +58,7 @@ class AmbientView(context: Context) : FrameLayout(context) {
     private var storyIndex = -1
     private var panelIndex = -1
     private var showingA = true
+    @Volatile private var weatherText = ""
 
     init {
         LayoutInflater.from(context).inflate(R.layout.ambient, this, true)
@@ -75,7 +77,7 @@ class AmbientView(context: Context) : FrameLayout(context) {
         override fun run() {
             val now = Date()
             clock.text = DateFormat.getTimeFormat(context).format(now)
-            date.text = DateFormat.format("EEEE, d MMMM", now).toString() + (cfg.city.takeIf { it.isNotBlank() }?.let { "  ·  $it" } ?: "")
+            date.text = DateFormat.format("EEEE, d MMMM", now).toString() + weatherText
             ticker.setSegments(Ticker.build(context, now.time, cfg.showF1))
             main.postDelayed(this, 1000 - System.currentTimeMillis() % 1000 + 5)
         }
@@ -101,6 +103,9 @@ class AmbientView(context: Context) : FrameLayout(context) {
     fun start() {
         MarketService.start(context)
         io.execute {
+            runCatching { WeatherRepository(context).current(cfg.city) }.getOrNull()?.let { w ->
+                weatherText = "  ·  ${w.city} ${w.tempC}°" + (w.description.takeIf { it.isNotBlank() }?.let { " $it" } ?: "")
+            }
             val cached = NewsRepository(context).cached()
             val list = cached?.let { it.top + it.tech }.orEmpty().filter { it.imageUrl != null }.shuffled().take(12)
             main.post {
@@ -164,7 +169,7 @@ class AmbientView(context: Context) : FrameLayout(context) {
 
     private fun kicker(text: String, color: Int = 0xFFFFD60A.toInt()) = TextView(context).apply {
         this.text = text.uppercase(Locale.getDefault())
-        textSize = 11f
+        textSize = 12f
         letterSpacing = 0.1f
         setTextColor(color)
         typeface = Typeface.DEFAULT_BOLD

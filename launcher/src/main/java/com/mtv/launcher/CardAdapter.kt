@@ -32,6 +32,7 @@ class CardAdapter(
         is F1Card -> R.layout.item_f1
         is PolyCard -> R.layout.item_poly
         is EventCard -> R.layout.item_event
+        is NowPlayingCard -> R.layout.item_nowplaying
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
@@ -46,6 +47,7 @@ class CardAdapter(
             R.layout.item_f1 -> F1Holder(view)
             R.layout.item_poly -> PolyHolder(view)
             R.layout.item_event -> EventHolder(view)
+            R.layout.item_nowplaying -> NowPlayingHolder(view)
             else -> NoteHolder(view)
         }
     }
@@ -307,6 +309,50 @@ class CardAdapter(
             where.text = ev.location
             where.visibility = if (ev.location.isBlank()) View.GONE else View.VISIBLE
             focusView.contentDescription = "${whenView.text}: ${ev.title}"
+        }
+    }
+
+    inner class NowPlayingHolder(itemView: View) : Holder(itemView, R.id.card) {
+        private val art: ImageView = itemView.findViewById(R.id.np_art)
+        private val app: TextView = itemView.findViewById(R.id.np_app)
+        private val title: TextView = itemView.findViewById(R.id.np_title)
+        private val artist: TextView = itemView.findViewById(R.id.np_artist)
+        private val state: TextView = itemView.findViewById(R.id.np_state)
+        private val progress: View = itemView.findViewById(R.id.np_progress)
+        private val bars: List<View> = listOf(R.id.eq1, R.id.eq2, R.id.eq3).map { itemView.findViewById(it) }
+
+        init {
+            // Left/right skip tracks while the card is focused; OK (click) plays or pauses.
+            focusView.setOnKeyListener { _, keyCode, event ->
+                if (event.action != android.view.KeyEvent.ACTION_DOWN) return@setOnKeyListener false
+                when (keyCode) {
+                    android.view.KeyEvent.KEYCODE_MEDIA_NEXT, android.view.KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> { com.mtv.launcher.media.NowPlaying.next(); true }
+                    android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS, android.view.KeyEvent.KEYCODE_MEDIA_REWIND -> { com.mtv.launcher.media.NowPlaying.previous(); true }
+                    else -> false
+                }
+            }
+        }
+
+        override fun bindCard(item: Card) {
+            val t = (item as NowPlayingCard).track
+            app.text = itemView.context.getString(R.string.np_label, t.appLabel)
+            title.text = t.title
+            artist.text = t.artist
+            state.text = itemView.context.getString(if (t.playing) R.string.np_pause else R.string.np_play)
+            if (t.art != null) art.setImageBitmap(t.art) else art.setImageResource(R.drawable.ic_ytm)
+            progress.pivotX = 0f
+            progress.scaleX = if (t.duration > 0) (t.position.toFloat() / t.duration).coerceIn(0f, 1f) else 0f
+            bars.forEachIndexed { i, b -> if (t.playing) bounce(b, i) else { b.animate().cancel(); b.scaleY = 0.3f } }
+            focusView.contentDescription = "${t.title}, ${t.artist}"
+        }
+
+        /** Little equaliser bars that dance while music plays. */
+        private fun bounce(v: View, i: Int) {
+            v.pivotY = v.height.toFloat().takeIf { it > 0 } ?: itemView.context.dp(14).toFloat()
+            val target = listOf(1f, 0.45f, 0.8f, 0.3f, 0.95f, 0.55f)[(System.nanoTime() / 1000 % 6).toInt()]
+            v.animate().scaleY(target).setDuration(260L + i * 70).withEndAction {
+                if (v.isAttachedToWindow && (card as? NowPlayingCard)?.track?.playing == true) bounce(v, i)
+            }.start()
         }
     }
 

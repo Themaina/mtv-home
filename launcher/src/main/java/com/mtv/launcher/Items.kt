@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import com.mtv.launcher.cal.CalEvent
 import com.mtv.launcher.f1.F1Race
 import com.mtv.launcher.market.Quote
+import com.mtv.launcher.media.Track
 import com.mtv.launcher.poly.PolyEvent
 import com.mtv.launcher.news.Story
 import com.mtv.launcher.notify.Note
@@ -59,6 +60,11 @@ data class PolyCard(val event: PolyEvent) : Card {
 
 data class EventCard(val event: CalEvent) : Card {
     override val key: String get() = "cal:${event.start}:${event.title}"
+}
+
+/** What's playing right now, with play/pause on OK. */
+data class NowPlayingCard(val track: Track) : Card {
+    override val key: String get() = "nowplaying"
 }
 
 enum class Brand { YOUTUBE, YOUTUBE_MUSIC, F1TV }

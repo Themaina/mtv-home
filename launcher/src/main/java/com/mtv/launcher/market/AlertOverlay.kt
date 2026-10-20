@@ -37,8 +37,9 @@ object AlertOverlay {
         view.findViewById<TextView>(R.id.alert_title).text = alert.title
         view.findViewById<TextView>(R.id.alert_detail).text = alert.detail
         view.findViewById<View>(R.id.alert_bar).setBackgroundColor(
-            when (alert.positive) { true -> 0xFF30D158.toInt(); false -> 0xFFFF453A.toInt(); null -> 0xFFFFD60A.toInt() },
+            alert.accent ?: when (alert.positive) { true -> 0xFF30D158.toInt(); false -> 0xFFFF453A.toInt(); null -> 0xFFFFD60A.toInt() },
         )
+        alert.label?.let { view.findViewById<TextView>(R.id.alert_label).text = it }
         val params = WindowManager.LayoutParams(
             context.dp(300), WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,

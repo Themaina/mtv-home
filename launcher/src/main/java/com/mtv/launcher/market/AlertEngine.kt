@@ -14,6 +14,9 @@ data class MarketAlert(
     /** true = good news colour, false = bad, null = neutral. */
     val positive: Boolean?,
     val at: Long,
+    /** Overrides the green/red/yellow bar, e.g. F1 red. */
+    val accent: Int? = null,
+    val label: String? = null,
 )
 
 /**

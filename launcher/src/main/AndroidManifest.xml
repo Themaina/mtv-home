@@ -92,6 +92,20 @@
         <activity android:name=".AgendaActivity" android:exported="false" android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|smallestScreenSize|uiMode" />
 
+        <activity android:name=".ambient.AmbientActivity" android:exported="false" android:screenOrientation="landscape"
+            android:theme="@style/Theme.MtvLauncher" />
+
+        <service
+            android:name=".ambient.AmbientDream"
+            android:exported="true"
+            android:label="@string/ambient"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
         <service
             android:name=".market.MarketService"
             android:exported="false"

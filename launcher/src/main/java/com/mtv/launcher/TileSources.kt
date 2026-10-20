@@ -175,7 +175,14 @@ object TileSources {
             icon = ctx.getDrawable(R.drawable.ic_person),
             color = 0xFF8E5A00.toInt(),
         )
-        return listOf(personalize) + listOf(
+        val ambient = Tile(
+            key = "settings:ambient",
+            label = ctx.getString(R.string.ambient),
+            intent = Intent(ctx, com.mtv.launcher.ambient.AmbientActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            icon = ctx.getDrawable(R.drawable.ic_clock),
+            color = 0xFF1B3A5C.toInt(),
+        )
+        return listOf(personalize, ambient) + listOf(
             Triple(Settings.ACTION_SETTINGS, R.string.tv_settings, R.drawable.ic_settings),
             Triple(Settings.ACTION_WIFI_SETTINGS, R.string.network, R.drawable.ic_wifi),
             Triple(Settings.ACTION_SOUND_SETTINGS, R.string.sound, R.drawable.ic_volume),

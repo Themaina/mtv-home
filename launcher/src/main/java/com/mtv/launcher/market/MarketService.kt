@@ -12,8 +12,10 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.IBinder
 import android.util.Log
+import com.mtv.launcher.DataHub
 import com.mtv.launcher.R
 import com.mtv.launcher.config.UserConfig
+import com.mtv.launcher.f1.F1Repository
 
 /**
  * Watches the user's watchlist all the time (not just while the dashboard is open),
@@ -33,12 +35,53 @@ class MarketService : Service() {
         }
     }
 
+    private var f1LoadedAt = 0L
+    private val f1Tick = Runnable { f1Check() }
+
     override fun onCreate() {
         super.onCreate()
         startInForeground()
         thread = HandlerThread("market").apply { start() }
         worker = Handler(thread.looper)
         worker.post(tick)
+        worker.post(f1Tick)
+    }
+
+    /**
+     * F1 session alerts: a red banner 15 minutes before each practice, qualifying, sprint
+     * and race, and again at the start. Re-plans itself for the next alert.
+     */
+    private fun f1Check() {
+        val cfg = UserConfig(this)
+        val now = System.currentTimeMillis()
+        if (!cfg.showF1 || !cfg.alertsEnabled) { worker.postDelayed(f1Tick, 30 * 60_000L); return }
+        if (DataHub.f1 == null || now - f1LoadedAt > 6 * 3_600_000L) {
+            runCatching { F1Repository.fetch(now) }.getOrNull()?.let { DataHub.f1 = it; f1LoadedAt = now; DataHub.changed() }
+        }
+        val race = DataHub.f1?.next(now)
+        if (race == null) { worker.postDelayed(f1Tick, 3 * 3_600_000L); return }
+
+        val fired = getSharedPreferences("f1_alerts", Context.MODE_PRIVATE)
+        var nextAt = Long.MAX_VALUE
+        for (s in race.sessions) {
+            for ((offset, kind) in listOf(15 * 60_000L to "soon", 0L to "now")) {
+                val at = s.start - offset
+                val key = "${race.season}:${race.round}:${s.label}:$kind"
+                if (fired.getBoolean(key, false)) continue
+                when {
+                    // Due now (allow two minutes of lateness, e.g. after a reboot).
+                    now >= at && now - at < 2 * 60_000L -> {
+                        fired.edit().putBoolean(key, true).apply()
+                        val title = getString(if (kind == "soon") R.string.f1_alert_soon else R.string.f1_alert_now, s.label)
+                        AlertOverlay.show(this, MarketAlert(key, title, race.name, null, now, accent = 0xFFE10600.toInt(), label = "Formula 1"))
+                    }
+                    now > at -> fired.edit().putBoolean(key, true).apply() // missed while off; don't announce late
+                    else -> nextAt = minOf(nextAt, at)
+                }
+            }
+        }
+        val delay = if (nextAt == Long.MAX_VALUE) 3 * 3_600_000L else (nextAt - now).coerceIn(1_000L, 3 * 3_600_000L)
+        worker.postDelayed(f1Tick, delay)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

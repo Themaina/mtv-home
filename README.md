@@ -44,6 +44,20 @@ Pass options after `bash -s --`, for example `… | bash -s -- --tv 192.168.1.20
 5. **Your apps**, **Notifications**, **Polymarket** (your topics first, then what's trending),
    **Top stories**, **Big Tech**, **Inputs**, **All apps** and **Settings**.
 
+Also:
+
+- **Ticker tape** along the bottom, finance-channel style: your quotes, the F1 countdown and Polymarket odds.
+- **Now Playing**: when YouTube Music, Spotify or YouTube is playing, a card shows the track with artwork.
+  OK plays or pauses, the remote's ⏭ / ⏮ skip, hold OK opens the app.
+- **F1 session alerts**: a red banner over whatever you're watching 15 minutes before each practice,
+  qualifying, sprint and race, and again at the start.
+- **Race-weekend mode**: from the night before first practice until the race ends the dashboard turns
+  F1 red and the race card leads the Today row.
+- **Ambient screensaver**: slowly drifting news photography, a big clock and a panel that rotates through
+  markets, the next Grand Prix and Polymarket. Also in the Settings row as **Ambient mode**.
+- The installer **hides the TV's original launcher** so it never comes back (`--keep-stock` to keep it;
+  `--uninstall` restores it).
+
 Everything opens into a full screen you drive with the remote:
 
 | Card | Opens |

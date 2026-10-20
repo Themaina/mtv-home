@@ -14,6 +14,7 @@
 #   --calendar URL        Google Calendar "Secret address in iCal format" (optional)
 #   --apk FILE            install a local APK instead of the latest GitHub release
 #   --no-launch           don't switch the TV to the dashboard at the end
+#   --keep-stock          keep the TV's original home screen enabled (by default it is hidden)
 #   --yes                 accept defaults, never prompt
 #   --uninstall           put the original home screen back and remove the app
 set -euo pipefail
@@ -27,7 +28,7 @@ WORK="$HOME/.mtv"
 # Everything runs inside main(), called on the last line: under `curl | bash` this makes bash read
 # the whole script before running any of it, so commands that read stdin can't eat the script.
 main() {
-TV="${TV_ADDR:-}"; NAME=""; CITY=""; WATCHLIST=""; CALENDAR=""; APK=""; LAUNCH=1; YES=""; UNINSTALL=""
+TV="${TV_ADDR:-}"; NAME=""; CITY=""; WATCHLIST=""; CALENDAR=""; APK=""; LAUNCH=1; YES=""; UNINSTALL=""; KEEP_STOCK=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --tv) TV="$2"; shift ;;
@@ -37,6 +38,7 @@ while [ $# -gt 0 ]; do
     --calendar) CALENDAR="$2"; shift ;;
     --apk) APK="$2"; shift ;;
     --no-launch) LAUNCH="" ;;
+    --keep-stock) KEEP_STOCK=1 ;;
     --yes|-y) YES=1 ;;
     --uninstall) UNINSTALL=1 ;;
     -h|--help) sed -n '2,22p' "$0"; exit 0 ;;
@@ -135,7 +137,11 @@ SAVED_HOME="$WORK/previous-home-${TV//[:.]/_}.txt"
 
 # ---- uninstall ----------------------------------------------------------------------------
 if [ -n "$UNINSTALL" ]; then
-  if [ -s "$SAVED_HOME" ]; then tv shell cmd package set-home-activity "$(cat "$SAVED_HOME")" >/dev/null || true; fi
+  if [ -s "$SAVED_HOME" ]; then
+    tv shell pm enable "$(cut -d/ -f1 "$SAVED_HOME")" >/dev/null 2>&1 || true
+    tv shell cmd package set-home-activity "$(cat "$SAVED_HOME")" >/dev/null || true
+  fi
+  tv shell settings put secure screensaver_components com.android.dreams.basic/com.android.dreams.basic.Colors >/dev/null 2>&1 || true
   tv uninstall "$PKG" >/dev/null && bold "Removed mtv Home. Home screen: $(current_home)"
   exit 0
 fi
@@ -203,6 +209,13 @@ tv shell cmd deviceidle whitelist +"$PKG" >/dev/null 2>&1 || true
 
 # ---- 7. home screen -----------------------------------------------------------------------
 tv shell cmd package set-home-activity "$HOME_ACTIVITY" >/dev/null 2>&1 || true
+# Hide the TV's original launcher so it never comes back (reversible: --uninstall re-enables it).
+STOCK_PKG="$( [ -s "$SAVED_HOME" ] && cut -d/ -f1 "$SAVED_HOME" || true )"
+if [ -z "$KEEP_STOCK" ] && [ -n "$STOCK_PKG" ] && [ "$STOCK_PKG" != "$PKG" ] && [ "$STOCK_PKG" != "com.android.tv.settings" ]; then
+  tv shell pm disable-user --user 0 "$STOCK_PKG" >/dev/null 2>&1 && info "Old home screen ($STOCK_PKG): hidden"
+fi
+# The ambient screensaver (Settings › Screen saver can change it back).
+tv shell settings put secure screensaver_components "$PKG/.ambient.AmbientDream" >/dev/null 2>&1 && info "Screensaver: mtv Ambient"
 if [ -n "$LAUNCH" ]; then tv shell input keyevent KEYCODE_HOME; fi
 
 bold "Done. Home screen: $(current_home)"

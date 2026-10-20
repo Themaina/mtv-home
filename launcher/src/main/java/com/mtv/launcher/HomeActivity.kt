@@ -25,6 +25,7 @@ import com.mtv.launcher.config.UserConfig
 import com.mtv.launcher.f1.F1Repository
 import com.mtv.launcher.poly.PolymarketRepository
 import com.mtv.launcher.img.ImageLoader
+import com.mtv.launcher.media.NowPlaying
 import com.mtv.launcher.market.MarketHub
 import com.mtv.launcher.market.MarketService
 import com.mtv.launcher.market.Session
@@ -51,6 +52,9 @@ class HomeActivity : Activity() {
     private lateinit var bellCount: TextView
     private lateinit var adapter: RowsAdapter
     private lateinit var config: UserConfig
+    private lateinit var tickerView: TickerView
+    private var raceWeekend: Boolean? = null
+    private val nowPlayingListener: () -> Unit = { publish(refocus = false) }
 
     private val tilesIo = Executors.newSingleThreadExecutor()
     private val netIo = Executors.newSingleThreadExecutor()
@@ -129,6 +133,7 @@ class HomeActivity : Activity() {
         weatherView = findViewById(R.id.weather)
         bell = findViewById(R.id.bell)
         bellCount = findViewById(R.id.bell_count)
+        tickerView = findViewById(R.id.ticker)
 
         adapter = RowsAdapter(onCardClick = ::onCardClick, onCardLongClick = ::onCardLongClick)
         rows.layoutManager = RowsLayoutManager(this)
@@ -136,6 +141,15 @@ class HomeActivity : Activity() {
         rows.setItemViewCacheSize(4)
         rows.adapter = adapter
         rows.viewTreeObserver.addOnGlobalFocusChangeListener { _, newFocus -> newFocus?.let(::alignRow) }
+        // The fade under the clock only appears once content scrolls beneath it.
+        val topScrim = findViewById<View>(R.id.top_scrim)
+        rows.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                val scrolled = rv.computeVerticalScrollOffset() > dp(8)
+                val target = if (scrolled) 1f else 0f
+                if (topScrim.alpha != target) topScrim.animate().alpha(target).setDuration(200).start()
+            }
+        })
 
         registerCompat(packageReceiver, IntentFilter().apply {
             addAction(Intent.ACTION_PACKAGE_ADDED)
@@ -147,6 +161,7 @@ class HomeActivity : Activity() {
         NotificationHub.observe(noteListener)
         MarketHub.observe(marketListener)
         DataHub.observe(dataListener)
+        NowPlaying.observe(this, nowPlayingListener)
         config.registerListener(configListener)
         MarketService.start(this)
 
@@ -199,6 +214,7 @@ class HomeActivity : Activity() {
         NotificationHub.stopObserving(noteListener)
         MarketHub.stopObserving(marketListener)
         DataHub.stopObserving(dataListener)
+        NowPlaying.stopObserving(nowPlayingListener)
         config.unregisterListener(configListener)
         extraIo.shutdownNow()
         tilesIo.shutdownNow()
@@ -309,9 +325,15 @@ class HomeActivity : Activity() {
         val race = if (config.showF1) DataHub.f1?.next(now) else null
         val events = DataHub.events.filter { it.end > now }.take(10)
 
+        val weekend = race != null && now >= race.sessions.first().start - 12 * 3_600_000L
+        applyTheme(weekend)
+        tickerView.setSegments(Ticker.build(this, now, config.showF1))
         val today = buildList<Card> {
+            NowPlaying.track?.let { add(NowPlayingCard(it)) }
+            // Race weekend: the race leads the Today row.
+            if (weekend) race?.let { add(F1Card(it)) }
             if (config.watchlist.isNotEmpty()) add(MarketsCard(quotes, marketStatus(now)))
-            race?.let { add(F1Card(it)) }
+            if (!weekend) race?.let { add(F1Card(it)) }
             addAll(TileSources.featured(this@HomeActivity))
             (snapshot?.top.orEmpty() + snapshot?.tech.orEmpty()).firstOrNull { it.imageUrl != null }?.let { add(TopStoryCard(it)) }
         }
@@ -422,10 +444,15 @@ class HomeActivity : Activity() {
             is F1Card -> startActivity(Intent(this, F1Activity::class.java))
             is PolyCard -> startActivity(PolyActivity.intent(this, card.event.id))
             is EventCard -> startActivity(Intent(this, AgendaActivity::class.java))
+            is NowPlayingCard -> NowPlaying.togglePlayPause()
         }
     }
 
     private fun onCardLongClick(card: Card): Boolean {
+        if (card is NowPlayingCard) {
+            packageManager.getLeanbackLaunchIntentForPackage(card.track.packageName)?.let { startActivity(it) }
+            return true
+        }
         if (card is NoteCard) {
             NotificationHub.dismiss(card.note)
             return true
@@ -455,6 +482,17 @@ class HomeActivity : Activity() {
     }
 
     // ---- chrome ----
+
+    /** F1 red from the night before first practice until the race ends; navy otherwise. */
+    private fun applyTheme(weekend: Boolean) {
+        if (raceWeekend == weekend) return
+        raceWeekend = weekend
+        val root = findViewById<View>(R.id.home_root)
+        root.animate().alpha(0.6f).setDuration(200).withEndAction {
+            root.setBackgroundResource(if (weekend) R.drawable.dash_bg_race else R.drawable.dash_bg)
+            root.animate().alpha(1f).setDuration(400).start()
+        }.start()
+    }
 
     private fun updateBell() {
         val count = notes.size

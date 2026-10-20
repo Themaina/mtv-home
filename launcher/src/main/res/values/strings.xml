@@ -73,4 +73,10 @@
     <string name="setup_calendar">Google Calendar link (Settings › your calendar › Secret address in iCal format)</string>
     <string name="setup_poly">Polymarket topics (comma separated)</string>
     <string name="setup_f1">Show Formula 1</string>
+    <string name="np_label">Now playing · %1$s</string>
+    <string name="np_pause">OK pause   ·   ⏭ next</string>
+    <string name="np_play">OK play   ·   ⏭ next</string>
+    <string name="ambient">Ambient mode</string>
+    <string name="f1_alert_soon">%1$s starts in 15 minutes</string>
+    <string name="f1_alert_now">%1$s is starting now</string>
 </resources>

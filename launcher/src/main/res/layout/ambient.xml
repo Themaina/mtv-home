@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF000000">
+
+    <ImageView
+        android:id="@+id/amb_image_a"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/amb_image_b"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/ambient_scrim" />
+
+    <FrameLayout
+        android:id="@+id/amb_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="36dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/amb_clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-thin"
+                android:includeFontPadding="false"
+                android:shadowColor="#99000000"
+                android:shadowRadius="12"
+                android:textColor="#FFFFFFFF"
+                android:textSize="66sp" />
+
+            <TextView
+                android:id="@+id/amb_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:shadowColor="#99000000"
+                android:shadowRadius="8"
+                android:textColor="#E6FFFFFF"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/amb_panel"
+            android:layout_width="420dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_marginBottom="34dp"
+            android:background="@drawable/ambient_panel"
+            android:padding="16dp" />
+
+        <TextView
+            android:id="@+id/amb_caption"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="40dp"
+            android:gravity="end"
+            android:maxLines="3"
+            android:shadowColor="#CC000000"
+            android:shadowRadius="8"
+            android:textColor="#CCFFFFFF"
+            android:textSize="12sp" />
+    </FrameLayout>
+
+    <com.mtv.launcher.TickerView
+        android:id="@+id/amb_ticker"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="10dp" />
+</FrameLayout>

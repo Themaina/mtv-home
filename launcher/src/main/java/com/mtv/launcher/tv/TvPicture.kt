@@ -32,8 +32,10 @@ object TvPicture {
     // Video items (TvPictureManager.PICTURE_*)
     const val BRIGHTNESS = 0; const val CONTRAST = 1; const val SATURATION = 2; const val SHARPNESS = 3; const val HUE = 4; const val BACKLIGHT = 5
 
+    private const val TOKEN_AUDIO = "com.toptech.api.ITvAudio"
     private var picture: IBinder? = null
     private var common: IBinder? = null
+    private var audio: IBinder? = null
 
     val available: Boolean get() = binder("ITvPicture", TOKEN_PICTURE) != null
 
@@ -42,7 +44,7 @@ object TvPicture {
     }.onFailure { Log.w(TAG, "ServiceManager lookup failed: $it") }.getOrNull()
 
     private fun binder(name: String, token: String): IBinder? {
-        val cached = if (token == TOKEN_PICTURE) picture else common
+        val cached = when (token) { TOKEN_PICTURE -> picture; TOKEN_AUDIO -> audio; else -> common }
         if (cached?.isBinderAlive == true) return cached
         val tv = serviceManager(SERVICE) ?: return null
         val data = Parcel.obtain(); val reply = Parcel.obtain()
@@ -51,14 +53,14 @@ object TvPicture {
             data.writeString(name)
             tv.transact(1, data, reply, 0) // ITvService.getService(String)
             reply.readException()
-            reply.readStrongBinder().also { if (token == TOKEN_PICTURE) picture = it else common = it }
+            reply.readStrongBinder().also { when (token) { TOKEN_PICTURE -> picture = it; TOKEN_AUDIO -> audio = it; else -> common = it } }
         } catch (e: Exception) {
             Log.w(TAG, "getService($name) failed: $e"); null
         } finally { data.recycle(); reply.recycle() }
     }
 
     private fun call(token: String, code: Int, vararg args: Int): Int? {
-        val b = binder(if (token == TOKEN_PICTURE) "ITvPicture" else "ITvCommon", token) ?: return null
+        val b = binder(when (token) { TOKEN_PICTURE -> "ITvPicture"; TOKEN_AUDIO -> "ITvAudio"; else -> "ITvCommon" }, token) ?: return null
         val data = Parcel.obtain(); val reply = Parcel.obtain()
         return try {
             data.writeInterfaceToken(token)
@@ -72,6 +74,19 @@ object TvPicture {
     }
 
     fun pic(code: Int, vararg args: Int): Int? = call(TOKEN_PICTURE, code, *args)
+
+    /** ITvAudio (TopTech sound engine): codes from the TV's AIDL stub. */
+    fun snd(code: Int, vararg args: Int): Int? = call(TOKEN_AUDIO, code, *args)
+
+    /** Read-only snapshot of the TV's sound engine. */
+    fun audioSnapshot(): String = buildString {
+        fun g(name: String, code: Int) = append(" $name=${snd(code)}")
+        g("soundMode", 2); g("bass", 6); g("treble", 8); g("balance", 10); g("avcMode", 12); g("avc", 14)
+        g("surround", 16); g("outputMode", 18); g("spdifMode", 20); g("bassSwitch", 24); g("bassVol", 26)
+        g("trueBass", 34); g("speakerVol", 48); g("speakerDelay", 49)
+        g("dbxAvailable", 58); g("dbx", 59); g("dbxSonics", 61); g("dbxVolume", 63); g("dbxSurround", 65); g("dolbyDAP", 69)
+        append(" eq=" + (0..9).map { snd(22, it) }.joinToString(","))
+    }
 
     /** ITvCommon.getCurrentInputSource (34 = Android/storage, 23-26 = HDMI1-4). */
     fun currentSource(): Int? = call(TOKEN_COMMON, 6)

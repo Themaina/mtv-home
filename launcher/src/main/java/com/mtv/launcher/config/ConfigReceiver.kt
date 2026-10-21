@@ -16,6 +16,22 @@ import com.mtv.launcher.market.MarketService
 class ConfigReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         // Diagnostics: read (never write) the TV's native picture settings.
+        intent.getStringExtra("sound")?.let { cmd ->
+            val out = when (cmd) {
+                "jbl" -> com.mtv.launcher.tv.TvSound.applyJbl(context)
+                "restore" -> com.mtv.launcher.tv.TvSound.restore(context)
+                else -> com.mtv.launcher.tv.TvSound.summary()
+            }
+            Log.i("ConfigReceiver", "sound $cmd: $out")
+            resultData = out
+            return
+        }
+        if (intent.getStringExtra("probe") == "audio") {
+            val snap = com.mtv.launcher.tv.TvPicture.audioSnapshot()
+            Log.i("ConfigReceiver", "audio probe:$snap")
+            resultData = snap
+            return
+        }
         if (intent.getStringExtra("probe") == "picture") {
             val snap = com.mtv.launcher.tv.TvPicture.snapshot()
             Log.i("ConfigReceiver", "picture probe: $snap")

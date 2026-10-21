@@ -15,6 +15,26 @@ import com.mtv.launcher.market.MarketService
  */
 class ConfigReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        // Diagnostics: read (never write) the TV's native picture settings.
+        if (intent.getStringExtra("probe") == "picture") {
+            val snap = com.mtv.launcher.tv.TvPicture.snapshot()
+            Log.i("ConfigReceiver", "picture probe: $snap")
+            resultData = snap
+            return
+        }
+        if (intent.getStringExtra("open") == "calibrate") {
+            context.startActivity(android.content.Intent(context, com.mtv.launcher.calib.CalibrationActivity::class.java)
+                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+            resultData = "calibrate"
+            return
+        }
+        // Developer: show a raw test pattern (used to record the calibration clips).
+        intent.getStringExtra("pattern")?.toIntOrNull()?.let { n ->
+            context.startActivity(android.content.Intent(context, com.mtv.launcher.calib.PatternActivity::class.java)
+                .putExtra("pattern", n).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            resultData = "pattern $n"
+            return
+        }
         val cfg = UserConfig(context)
         intent.getStringExtra("name")?.let { cfg.name = it }
         intent.getStringExtra("city")?.let { cfg.city = it }

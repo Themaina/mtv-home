@@ -92,6 +92,12 @@
         <activity android:name=".AgendaActivity" android:exported="false" android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|smallestScreenSize|uiMode" />
 
+        <activity android:name=".calib.CalibrationActivity" android:exported="false" android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen" />
+
+        <activity android:name=".calib.PatternActivity" android:exported="false" android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen" />
+
         <activity android:name=".ambient.AmbientActivity" android:exported="false" android:screenOrientation="landscape"
             android:theme="@style/Theme.MtvLauncher" />
 

@@ -55,6 +55,11 @@ Also:
   F1 red and the race card leads the Today row.
 - **Ambient screensaver**: slowly drifting news photography, a big clock and a panel that rotates through
   markets, the next Grand Prix and Polymarket. Also in the Settings row as **Ambient mode**.
+- **Calibrate picture** (Settings row): a guided, 8-step calibration with test patterns played *as video*,
+  so they pass through the TV's picture engine like films. On Toptech/Realtek TVs the steps drive the TV's
+  own picture service live: picture mode, colour temperature, brightness, contrast, backlight, colour,
+  sharpness, tint, noise reduction and the image enhancers (dynamic contrast/colour/backlight). Your
+  starting values are saved and can be restored on the last step. Other TVs get the patterns only.
 - The installer **hides the TV's original launcher** so it never comes back (`--keep-stock` to keep it;
   `--uninstall` restores it).
 

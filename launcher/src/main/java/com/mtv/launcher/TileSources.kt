@@ -187,7 +187,14 @@ object TileSources {
             icon = ctx.getDrawable(R.drawable.ic_clock),
             color = 0xFF1B3A5C.toInt(),
         )
-        return listOf(personalize, ambient) + listOf(
+        val calibrate = Tile(
+            key = "settings:calibrate",
+            label = ctx.getString(R.string.calibrate),
+            intent = Intent(ctx, com.mtv.launcher.calib.CalibrationActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            icon = ctx.getDrawable(R.drawable.ic_tune),
+            color = 0xFF2B5D3A.toInt(),
+        )
+        return listOf(personalize, calibrate, ambient) + listOf(
             Triple(Settings.ACTION_SETTINGS, R.string.tv_settings, R.drawable.ic_settings),
             Triple(Settings.ACTION_WIFI_SETTINGS, R.string.network, R.drawable.ic_wifi),
             Triple(Settings.ACTION_SOUND_SETTINGS, R.string.sound, R.drawable.ic_volume),

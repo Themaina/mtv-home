@@ -31,6 +31,9 @@ object TileSources {
     private val HIDDEN_PACKAGES = setOf(
         "com.zeasn.toptech.titanos2.launcher", // the stock Titan OS launcher we replace
         "com.toptech.quickmenu",               // empty factory debug screen
+        // Toptech's TV player: reached through the Inputs row instead. It can't be removed
+        // because it is what actually switches HDMI inputs on these TVs.
+        "com.toptech.tvmenu",
     )
 
     private const val COLOR_LIVE = 0xFF2E7D32.toInt()
@@ -84,8 +87,10 @@ object TileSources {
         val hardware = all.filter { it.serviceInfo?.packageName?.startsWith("com.realtek") == true }
 
         val tiles = mutableListOf<Tile>()
+        // Live TV only when a tuner input exists (antenna/cable). Owners without one can turn
+        // the tuner apps off and the tile disappears.
         val hasTuner = hardware.any { it.type == TvInputInfo.TYPE_TUNER }
-        if (hasTuner || hardware.isEmpty()) {
+        if (hasTuner) {
             tiles += sourceTile(ctx, "TV", ctx.getString(R.string.live_tv), R.drawable.ic_live_tv, COLOR_LIVE)
         }
 
